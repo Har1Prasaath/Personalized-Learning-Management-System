@@ -22,7 +22,10 @@ export default function Header() {
   };
 
   return (
-    <AppBar position="static" sx={{ bgcolor: 'primary.main' }}>
+    <AppBar position="static" sx={{ 
+      bgcolor: 'primary.main',
+      color: 'primary.contrastText'
+    }}>
       <Toolbar>
         <Typography
           variant="h6"

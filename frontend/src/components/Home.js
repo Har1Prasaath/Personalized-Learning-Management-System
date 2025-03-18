@@ -18,7 +18,7 @@ export default function Home() {
 
   return (
     <Box sx={{ mt: 4, px: 2 }}>
-      <Typography variant="h2" gutterBottom>Available Courses</Typography>
+      <Typography variant="h2" color="textPrimary" gutterBottom>Available Courses</Typography>
       <Grid container spacing={3}>
         {courses.map(course => (
           <Grid item xs={12} sm={6} md={4} key={course.id}>
