@@ -1,0 +1,16 @@
+# Ignore node_modules in both backend and frontend
+Personalized-Learning-Management-System/backend/node_modules/
+Personalized-Learning-Management-System/frontend/node_modules/
+
+# Ignore .env files in backend and frontend
+Personalized-Learning-Management-System/backend/.env
+Personalized-Learning-Management-System/frontend/.env
+
+# Ignore service account key
+Personalized-Learning-Management-System/backend/serviceAccountKey.json
+Personalized-Learning-Management-System\backend\serviceAccountKey.json
+
+# General ignores
+node_modules/
+.env
+backend/serviceAccountKey.json
