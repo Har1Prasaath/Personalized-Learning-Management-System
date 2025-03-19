@@ -25,9 +25,10 @@ export default function Header() {
     <AppBar 
       position="fixed"
       sx={{ 
-        bgcolor: 'primary.main',
-        color: 'primary.contrastText',
-        zIndex: (theme) => theme.zIndex.drawer + 2
+        background: 'linear-gradient(45deg, #4B8EC9 45%,rgb(212, 139, 129) 90%)',
+        color: 'white',
+        zIndex: (theme) => theme.zIndex.drawer + 2,
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
       }}
     >
       <Toolbar>
@@ -37,7 +38,7 @@ export default function Header() {
           sx={{ 
             flexGrow: 1, 
             cursor: 'pointer',
-            fontWeight: 600,
+            fontWeight: 700,
             letterSpacing: '0.5px',
             '&:hover': {
               opacity: 0.9
@@ -72,7 +73,7 @@ export default function Header() {
             color="inherit" 
             onClick={handleLogout}
             sx={{ 
-              fontWeight: 500,
+              fontWeight: 600,
               px: 2,
               '&:hover': { 
                 backgroundColor: 'rgba(255,255,255,0.1)',
