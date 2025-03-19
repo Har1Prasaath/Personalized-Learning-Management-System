@@ -3,7 +3,7 @@ import { AppBar, Toolbar, Typography, Button, Box, IconButton } from '@mui/mater
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
-import { ReactComponent as HomeIcon } from '../assets/home-icon.svg'; // Import the SVG file
+import { ReactComponent as HomeIcon } from '../assets/home-icon.svg';
 
 export default function Header() {
   const navigate = useNavigate();
@@ -11,52 +11,74 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigate('/'); // Redirect to login page after logout
+      navigate('/');
     } catch (error) {
       console.error('Logout error:', error);
     }
   };
 
   const handleHomeClick = () => {
-    navigate('/home'); // Navigate to home page when PLMS is clicked
+    navigate('/home');
   };
 
   return (
-    <AppBar position="static" sx={{ 
-      bgcolor: 'primary.main',
-      color: 'primary.contrastText'
-    }}>
+    <AppBar 
+      position="fixed"
+      sx={{ 
+        bgcolor: 'primary.main',
+        color: 'primary.contrastText',
+        zIndex: (theme) => theme.zIndex.drawer + 2
+      }}
+    >
       <Toolbar>
         <Typography
           variant="h6"
           component="div"
-          sx={{ flexGrow: 1, cursor: 'pointer' }}
+          sx={{ 
+            flexGrow: 1, 
+            cursor: 'pointer',
+            fontWeight: 600,
+            letterSpacing: '0.5px',
+            '&:hover': {
+              opacity: 0.9
+            }
+          }}
           onClick={handleHomeClick}
         >
           Personalized Learning Management System
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {/* Home Icon Button */}
+        
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <IconButton
             color="inherit"
             onClick={handleHomeClick}
             sx={{
+              p: 1,
               '&:hover': {
                 backgroundColor: 'rgba(255,255,255,0.1)',
+                transform: 'scale(1.1)'
               },
+              transition: 'all 0.2s ease'
             }}
           >
-            <HomeIcon />
+            <HomeIcon style={{ 
+              width: 28, 
+              height: 28,
+              fill: 'currentColor'
+            }} />
           </IconButton>
 
-          {/* Logout Button */}
           <Button 
             color="inherit" 
             onClick={handleLogout}
             sx={{ 
+              fontWeight: 500,
+              px: 2,
               '&:hover': { 
-                backgroundColor: 'rgba(255,255,255,0.1)' 
-              }
+                backgroundColor: 'rgba(255,255,255,0.1)',
+                transform: 'translateY(-1px)'
+              },
+              transition: 'all 0.2s ease'
             }}
           >
             Logout
