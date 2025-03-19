@@ -10,48 +10,48 @@ const db = admin.firestore();
 async function initializeData() {
   const courses = [
     {
-      id: 'math-101',
-      title: 'Mathematics 101',
-      description: 'Introductory mathematics course',
+      id: 'ai-101',
+      title: 'Artificial Intelligence 101',
+      description: 'Introduction to Artificial Intelligence',
       chapters: [
         {
-          id: 'algebra_intro',
-          title: 'Introduction to Algebra',
-          description: 'Basic algebraic concepts',
-          content: 'Algebra is the branch of mathematics...',
+          id: 'ai_intro',
+          title: 'Introduction to AI',
+          description: 'Understanding the basics of AI',
+          content: 'Artificial Intelligence is the simulation of human intelligence...',
           difficulty: 'beginner',
           quiz: [
             {
-              question: 'Solve 2x + 5 = 15',
-              options: ['5', '7', '10'],
+              question: 'What is AI?',
+              options: ['Artificial Intelligence', 'Automated Intelligence', 'Advanced Information'],
               correctAnswer: 0
             }
           ]
         },
         {
-          id: 'calculus_basics',
-          title: 'Basics of Calculus',
-          description: 'Introduction to derivatives and integrals',
-          content: 'Calculus is the study of change...',
+          id: 'machine_learning',
+          title: 'Machine Learning Basics',
+          description: 'Understanding how machines learn',
+          content: 'Machine learning enables systems to learn from data...',
           difficulty: 'intermediate',
           quiz: [
             {
-              question: 'What is the derivative of x²?',
-              options: ['2x', 'x', 'x²'],
-              correctAnswer: 0
+              question: 'Which algorithm is used for classification?',
+              options: ['K-Means', 'Linear Regression', 'Decision Tree'],
+              correctAnswer: 2
             }
           ]
         },
         {
-          id: 'linear_algebra',
-          title: 'Linear Algebra',
-          description: 'Introduction to vector spaces and matrices',
-          content: 'Linear algebra studies vector spaces...',
+          id: 'neural_networks',
+          title: 'Neural Networks',
+          description: 'Introduction to artificial neural networks',
+          content: 'Neural networks are inspired by the human brain...',
           difficulty: 'hard',
           quiz: [
             {
-              question: 'Find the determinant of [[1,2],[3,4]]',
-              options: ['-2', '2', '4'],
+              question: 'What is the activation function in a neural network?',
+              options: ['Softmax', 'Gradient', 'Momentum'],
               correctAnswer: 0
             }
           ]
@@ -59,48 +59,48 @@ async function initializeData() {
       ]
     },
     {
-      id: 'physics-101',
-      title: 'Physics 101',
-      description: 'Basic physics concepts',
+      id: 'economics-101',
+      title: 'Economics 101',
+      description: 'Basics of Economics',
       chapters: [
         {
-          id: 'motion_intro',
-          title: 'Introduction to Motion',
-          description: 'Understanding displacement, velocity, and acceleration',
-          content: 'Motion describes how objects move...',
+          id: 'demand_supply',
+          title: 'Demand and Supply',
+          description: 'Understanding market forces',
+          content: 'Demand and supply determine market prices...',
           difficulty: 'beginner',
           quiz: [
             {
-              question: 'What is the SI unit of velocity?',
-              options: ['m/s', 'km/h', 'm'],
-              correctAnswer: 0
-            }
-          ]
-        },
-        {
-          id: 'newtons_laws',
-          title: "Newton's Laws of Motion",
-          description: 'Understanding the three laws of motion',
-          content: "Newton's laws describe the relationship...",
-          difficulty: 'intermediate',
-          quiz: [
-            {
-              question: 'Which law states that F = ma?',
-              options: ['First Law', 'Second Law', 'Third Law'],
+              question: 'What happens when demand increases and supply remains constant?',
+              options: ['Price falls', 'Price rises', 'No change'],
               correctAnswer: 1
             }
           ]
         },
         {
-          id: 'thermodynamics',
-          title: 'Thermodynamics',
-          description: 'Study of heat and energy transfer',
-          content: 'Thermodynamics explores heat and work...',
+          id: 'microeconomics',
+          title: 'Microeconomics',
+          description: 'Study of individual economic behavior',
+          content: 'Microeconomics focuses on individual markets...',
+          difficulty: 'intermediate',
+          quiz: [
+            {
+              question: 'Which concept explains the satisfaction from consuming goods?',
+              options: ['Utility', 'Demand', 'Elasticity'],
+              correctAnswer: 0
+            }
+          ]
+        },
+        {
+          id: 'macroeconomics',
+          title: 'Macroeconomics',
+          description: 'Study of the overall economy',
+          content: 'Macroeconomics deals with national and global economies...',
           difficulty: 'hard',
           quiz: [
             {
-              question: 'What is the first law of thermodynamics?',
-              options: ['Conservation of energy', 'Entropy increases', 'PV = nRT'],
+              question: 'What is GDP?',
+              options: ['Gross Domestic Product', 'Global Development Plan', 'General Debt Payment'],
               correctAnswer: 0
             }
           ]
@@ -108,48 +108,97 @@ async function initializeData() {
       ]
     },
     {
-      id: 'chemistry-101',
-      title: 'Chemistry 101',
-      description: 'Fundamentals of chemistry',
+      id: 'history-101',
+      title: 'History 101',
+      description: 'Introduction to World History',
       chapters: [
         {
-          id: 'atomic_structure',
-          title: 'Atomic Structure',
-          description: 'Understanding protons, neutrons, and electrons',
-          content: 'Atoms are the building blocks of matter...',
+          id: 'ancient_civilizations',
+          title: 'Ancient Civilizations',
+          description: 'Exploring early human societies',
+          content: 'Ancient civilizations such as Mesopotamia...',
           difficulty: 'beginner',
           quiz: [
             {
-              question: 'What is the charge of an electron?',
-              options: ['Positive', 'Negative', 'Neutral'],
+              question: 'Which civilization is known for the pyramids?',
+              options: ['Roman', 'Egyptian', 'Greek'],
               correctAnswer: 1
             }
           ]
         },
         {
-          id: 'periodic_table',
-          title: 'Periodic Table',
-          description: 'Learning about elements and their properties',
-          content: 'The periodic table organizes elements...',
+          id: 'world_wars',
+          title: 'World Wars',
+          description: 'Study of World War I and II',
+          content: 'World War I began in 1914 due to political tensions...',
           difficulty: 'intermediate',
           quiz: [
             {
-              question: 'What is the atomic number of carbon?',
-              options: ['6', '12', '14'],
+              question: 'Which event triggered World War I?',
+              options: ['Treaty of Versailles', 'Assassination of Archduke Ferdinand', 'Pearl Harbor attack'],
+              correctAnswer: 1
+            }
+          ]
+        },
+        {
+          id: 'modern_history',
+          title: 'Modern History',
+          description: 'Post-World War II events',
+          content: 'The Cold War shaped the modern political landscape...',
+          difficulty: 'hard',
+          quiz: [
+            {
+              question: 'What was the main ideological conflict during the Cold War?',
+              options: ['Capitalism vs Socialism', 'Democracy vs Anarchy', 'Communism vs Fascism'],
+              correctAnswer: 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: 'env-sci-101',
+      title: 'Environmental Science 101',
+      description: 'Basics of Environmental Science',
+      chapters: [
+        {
+          id: 'ecosystem',
+          title: 'Ecosystem',
+          description: 'Understanding ecosystems',
+          content: 'An ecosystem consists of living and non-living components...',
+          difficulty: 'beginner',
+          quiz: [
+            {
+              question: 'What is the primary source of energy in most ecosystems?',
+              options: ['Sunlight', 'Water', 'Wind'],
               correctAnswer: 0
             }
           ]
         },
         {
-          id: 'chemical_bonding',
-          title: 'Chemical Bonding',
-          description: 'Understanding ionic and covalent bonds',
-          content: 'Atoms form bonds to achieve stability...',
+          id: 'pollution',
+          title: 'Pollution',
+          description: 'Types and effects of pollution',
+          content: 'Pollution impacts air, water, and soil...',
+          difficulty: 'intermediate',
+          quiz: [
+            {
+              question: 'What is the major cause of air pollution?',
+              options: ['Plant growth', 'Burning fossil fuels', 'Photosynthesis'],
+              correctAnswer: 1
+            }
+          ]
+        },
+        {
+          id: 'climate_change',
+          title: 'Climate Change',
+          description: 'Impact of human activity on climate',
+          content: 'Climate change is driven by human activity...',
           difficulty: 'hard',
           quiz: [
             {
-              question: 'What type of bond involves the sharing of electrons?',
-              options: ['Ionic', 'Covalent', 'Metallic'],
+              question: 'What gas is primarily responsible for global warming?',
+              options: ['Oxygen', 'Carbon Dioxide', 'Nitrogen'],
               correctAnswer: 1
             }
           ]
@@ -157,97 +206,48 @@ async function initializeData() {
       ]
     },
     {
-      id: 'computer-101',
-      title: 'Computer Science 101',
-      description: 'Introduction to computer science',
+      id: 'psychology-101',
+      title: 'Psychology 101',
+      description: 'Introduction to Psychology',
       chapters: [
         {
-          id: 'programming_basics',
-          title: 'Programming Basics',
-          description: 'Introduction to programming languages',
-          content: 'Programming involves writing code...',
+          id: 'human_behavior',
+          title: 'Human Behavior',
+          description: 'Understanding why people behave the way they do',
+          content: 'Human behavior is influenced by various factors...',
           difficulty: 'beginner',
           quiz: [
             {
-              question: 'What is a variable in programming?',
-              options: ['Constant', 'Container for data', 'Function'],
+              question: 'Which part of the brain controls emotions?',
+              options: ['Cerebellum', 'Amygdala', 'Brainstem'],
               correctAnswer: 1
             }
           ]
         },
         {
-          id: 'data_structures',
-          title: 'Data Structures',
-          description: 'Understanding arrays, linked lists, and trees',
-          content: 'Data structures help organize data...',
+          id: 'cognitive_psychology',
+          title: 'Cognitive Psychology',
+          description: 'Study of mental processes',
+          content: 'Cognitive psychology explores how people think...',
           difficulty: 'intermediate',
           quiz: [
             {
-              question: 'Which data structure follows LIFO?',
-              options: ['Queue', 'Stack', 'Array'],
+              question: 'Which term refers to the process of storing information?',
+              options: ['Perception', 'Memory', 'Cognition'],
               correctAnswer: 1
             }
           ]
         },
         {
-          id: 'algorithms',
-          title: 'Algorithms',
-          description: 'Introduction to sorting and searching algorithms',
-          content: 'Algorithms solve computational problems...',
+          id: 'social_psychology',
+          title: 'Social Psychology',
+          description: 'How people interact with others',
+          content: 'Social psychology studies group behavior...',
           difficulty: 'hard',
           quiz: [
             {
-              question: 'What is the time complexity of binary search?',
-              options: ['O(n)', 'O(log n)', 'O(n²)'],
-              correctAnswer: 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: 'english-101',
-      title: 'English 101',
-      description: 'Introduction to English language',
-      chapters: [
-        {
-          id: 'grammar_basics',
-          title: 'Grammar Basics',
-          description: 'Learning about nouns, verbs, and adjectives',
-          content: 'Grammar defines the rules of language...',
-          difficulty: 'beginner',
-          quiz: [
-            {
-              question: 'Which is a verb?',
-              options: ['Run', 'Apple', 'Happy'],
-              correctAnswer: 0
-            }
-          ]
-        },
-        {
-          id: 'sentence_structure',
-          title: 'Sentence Structure',
-          description: 'Understanding subjects, predicates, and objects',
-          content: 'Sentence structure defines how words...',
-          difficulty: 'intermediate',
-          quiz: [
-            {
-              question: 'Which is the subject in "John runs fast"?',
-              options: ['John', 'Runs', 'Fast'],
-              correctAnswer: 0
-            }
-          ]
-        },
-        {
-          id: 'literary_analysis',
-          title: 'Literary Analysis',
-          description: 'Analyzing poems and novels',
-          content: 'Literary analysis explores themes...',
-          difficulty: 'hard',
-          quiz: [
-            {
-              question: 'Who wrote "Romeo and Juliet"?',
-              options: ['Shakespeare', 'Hemingway', 'Dickens'],
+              question: 'What is the term for adjusting behavior to match others?',
+              options: ['Conformity', 'Rebellion', 'Independence'],
               correctAnswer: 0
             }
           ]
@@ -270,4 +270,4 @@ async function initializeData() {
   }
 }
 
-initializeData().then(() => console.log('Data initialized'));
+initializeData().then(() => console.log('New courses added!'));
