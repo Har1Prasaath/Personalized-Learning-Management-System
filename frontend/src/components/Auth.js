@@ -18,7 +18,6 @@ export default function Auth() {
       } else {
         await createUserWithEmailAndPassword(auth, email, password);
       }
-      // Navigation will be handled automatically by the router
     } catch (error) {
       alert(getAuthErrorMessage(error.code));
     }
@@ -37,10 +36,19 @@ export default function Auth() {
 
   return (
     <Container maxWidth="xs" sx={{ mt: 8, px: 2 }}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Typography variant="h4" gutterBottom>
-          {isLogin ? 'Login' : 'Sign Up'}
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center',
+        backgroundColor: 'background.paper',
+        borderRadius: 4,
+        p: 4,
+        boxShadow: 3
+      }}>
+        <Typography variant="h4" gutterBottom sx={{ color: 'text.primary' }}>
+          {isLogin ? 'Welcome Back' : 'Create Account'}
         </Typography>
+        
         <form onSubmit={handleAuth} style={{ width: '100%' }}>
           <TextField
             fullWidth
@@ -49,6 +57,7 @@ export default function Auth() {
             variant="outlined"
             type="email"
             required
+            sx={{ backgroundColor: 'background.default' }}
             onChange={(e) => setEmail(e.target.value)}
           />
           <TextField
@@ -58,25 +67,53 @@ export default function Auth() {
             variant="outlined"
             type="password"
             required
+            sx={{ backgroundColor: 'background.default' }}
             onChange={(e) => setPassword(e.target.value)}
           />
+          
           <Button
             fullWidth
             type="submit"
             variant="contained"
-            color="primary"
-            sx={{ mt: 3 }}
+            size="large"
+            sx={{ 
+              mt: 3,
+              py: 1.5,
+              borderRadius: 2,
+              fontWeight: 600,
+              '&:hover': {
+                transform: 'translateY(-1px)'
+              }
+            }}
           >
-            {isLogin ? 'Login' : 'Create Account'}
+            {isLogin ? 'Sign In' : 'Create Account'}
           </Button>
-          <Button
-            fullWidth
-            color="secondary"
-            sx={{ mt: 2 }}
-            onClick={() => setIsLogin(!isLogin)}
-          >
-            {isLogin ? 'Create new account' : 'Existing user? Login'}
-          </Button>
+
+          <Typography variant="body2" sx={{ 
+            mt: 2, 
+            textAlign: 'center',
+            color: 'text.secondary'
+          }}>
+            {isLogin ? "Don't have an account?" : "Already have an account?"}
+            
+            <Button
+              variant="text"
+              size="small"
+              sx={{
+                ml: 1,
+                color: 'primary.main',
+                fontWeight: 600,
+                textTransform: 'none',
+                '&:hover': {
+                  backgroundColor: 'transparent',
+                  textDecoration: 'underline'
+                }
+              }}
+              onClick={() => setIsLogin(!isLogin)}
+            >
+              {isLogin ? 'Sign up instead' : 'Sign in instead'}
+            </Button>
+          </Typography>
         </form>
       </Box>
     </Container>

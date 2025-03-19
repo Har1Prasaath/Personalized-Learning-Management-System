@@ -1,5 +1,6 @@
+// App.js
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase';
 import Home from './components/Home';
@@ -11,6 +12,7 @@ import { Box, Container } from '@mui/material';
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -30,7 +32,9 @@ function App() {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Header />
+      {/* Show header only if not on auth page */}
+      {location.pathname !== '/' && <Header />}
+      
       <Box component="main" sx={{ flexGrow: 1, py: 3 }}>
         <Routes>
           <Route path="/" element={user ? <Navigate to="/home" /> : <Auth />} />
