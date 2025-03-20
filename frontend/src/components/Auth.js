@@ -95,12 +95,32 @@ export default function Auth() {
         width: '100%',
         height: '100%',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
         backgroundColor: '#F8FAFC',
       }}
     >
+      {/* System Title */}
+      <Typography
+        variant="h3"
+        sx={{
+          fontFamily: 'Merriweather, serif',
+          fontWeight: 700,
+          color: '#2D3748',
+          textAlign: 'center',
+          position: 'absolute',
+          top: '15%',
+          zIndex: 2,
+          width: '100%',
+          fontSize: { xs: '2rem', sm: '2.5rem' },
+          letterSpacing: '0.5px'
+        }}
+      >
+        Personalized Management System
+      </Typography>
+
       {/* Animated Particles Background */}
       <Particles
         id="tsparticles"
@@ -199,6 +219,7 @@ export default function Auth() {
           width: '100%',
           maxWidth: '400px',
           mx: 'auto',
+          marginTop: '80px'
         }}
       >
         <Typography
