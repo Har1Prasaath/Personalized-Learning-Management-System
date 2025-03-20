@@ -2,7 +2,17 @@ import React, { useState, useCallback } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
-import { Button, TextField, Container, Typography, Box, CircularProgress } from '@mui/material';
+import { 
+  Button, 
+  TextField, 
+  Container, 
+  Typography, 
+  Box, 
+  CircularProgress,
+  InputAdornment,
+  IconButton 
+} from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { keyframes } from '@emotion/react';
 import Particles from 'react-tsparticles';
 import { loadFull } from 'tsparticles';
@@ -36,7 +46,11 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+
+  // Toggle password visibility
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   // Particles initialization
   const particlesInit = useCallback(async (engine) => {
@@ -75,7 +89,7 @@ export default function Auth() {
   return (
     <Box
       sx={{
-        position: 'fixed', // Fix the container to the viewport
+        position: 'fixed',
         top: 0,
         left: 0,
         width: '100%',
@@ -83,8 +97,8 @@ export default function Auth() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        overflow: 'hidden', // Prevent scrolling
-        backgroundColor: '#F8FAFC', // Fallback background color
+        overflow: 'hidden',
+        backgroundColor: '#F8FAFC',
       }}
     >
       {/* Animated Particles Background */}
@@ -184,7 +198,7 @@ export default function Auth() {
           animation: `${fadeIn} 0.6s ease-out`,
           width: '100%',
           maxWidth: '400px',
-          mx: 'auto', // Center horizontally
+          mx: 'auto',
         }}
       >
         <Typography
@@ -233,7 +247,7 @@ export default function Auth() {
             margin="normal"
             label="Password"
             variant="outlined"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             required
             sx={{ 
               backgroundColor: 'rgba(255, 255, 255, 0.9)',
@@ -249,6 +263,20 @@ export default function Auth() {
                   borderColor: '#4B8EC9',
                 },
               }
+            }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                    edge="end"
+                    sx={{ color: 'text.secondary' }}
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
             }}
             onChange={(e) => setPassword(e.target.value)}
           />
