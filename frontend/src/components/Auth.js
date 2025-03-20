@@ -1,3 +1,4 @@
+// Auth.js
 import React, { useState, useCallback } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
@@ -8,7 +9,6 @@ import {
   Container, 
   Typography, 
   Box, 
-  CircularProgress,
   InputAdornment,
   IconButton 
 } from '@mui/material';
@@ -16,8 +16,8 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { keyframes } from '@emotion/react';
 import Particles from 'react-tsparticles';
 import { loadFull } from 'tsparticles';
+import { useLoading } from '../context/LoadingContext';
 
-// Animation keyframes
 const fadeIn = keyframes`
   from { 
     opacity: 0; 
@@ -29,38 +29,23 @@ const fadeIn = keyframes`
   }
 `;
 
-const pulse = keyframes`
-  0% { 
-    transform: scale(1); 
-  }
-  50% { 
-    transform: scale(1.05); 
-  }
-  100% { 
-    transform: scale(1); 
-  }
-`;
-
 export default function Auth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
-  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { setIsLoading } = useLoading();
   const navigate = useNavigate();
 
-  // Toggle password visibility
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
-  // Particles initialization
   const particlesInit = useCallback(async (engine) => {
     await loadFull(engine);
   }, []);
 
-  // Handle authentication
   const handleAuth = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setIsLoading(true);
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
@@ -70,11 +55,10 @@ export default function Auth() {
     } catch (error) {
       alert(getAuthErrorMessage(error.code));
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  // Get user-friendly error messages
   const getAuthErrorMessage = (code) => {
     switch (code) {
       case 'auth/invalid-email': return 'Invalid email format';
@@ -102,7 +86,6 @@ export default function Auth() {
         backgroundColor: '#F8FAFC',
       }}
     >
-      {/* System Title */}
       <Typography
         variant="h3"
         sx={{
@@ -118,10 +101,9 @@ export default function Auth() {
           letterSpacing: '0.5px'
         }}
       >
-        Personalized Management System
+        Personalized Learning Management System
       </Typography>
 
-      {/* Animated Particles Background */}
       <Particles
         id="tsparticles"
         init={particlesInit}
@@ -200,7 +182,6 @@ export default function Auth() {
         }}
       />
 
-      {/* Auth Form Container */}
       <Container
         maxWidth="xs"
         sx={{
@@ -307,7 +288,6 @@ export default function Auth() {
             type="submit"
             variant="contained"
             size="large"
-            disabled={loading}
             sx={{ 
               mt: 3,
               py: 1.5,
@@ -317,22 +297,12 @@ export default function Auth() {
               boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
               transition: 'all 0.3s ease',
               '&:hover': {
-                animation: `${pulse} 1s infinite`,
                 boxShadow: '0 6px 8px rgba(0, 0, 0, 0.2)',
                 transform: 'translateY(-1px)'
               },
-              '&:disabled': {
-                background: '#e0e0e0'
-              }
             }}
           >
-            {loading ? (
-              <CircularProgress size={24} sx={{ color: 'white' }} />
-            ) : isLogin ? (
-              'Sign In'
-            ) : (
-              'Create Account'
-            )}
+            {isLogin ? 'Sign In' : 'Create Account'}
           </Button>
 
           <Typography variant="body2" sx={{ 

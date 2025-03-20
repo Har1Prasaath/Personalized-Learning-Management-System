@@ -8,31 +8,35 @@ import Auth from './components/Auth';
 import Course from './components/Course';
 import Header from './components/Header';
 import { Box, Container } from '@mui/material';
+import LoadingSpinner from './components/LoadingSpinner';
+import { LoadingProvider, useLoading } from './context/LoadingContext'; // Add this import
+
+function AppWrapper() {
+  return (
+    <LoadingProvider>
+      <App />
+    </LoadingProvider>
+  );
+}
 
 function App() {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { setIsLoading } = useLoading(); // Now this is defined
   const location = useLocation();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsLoading(true);
       setUser(user);
-      setLoading(false);
+      setIsLoading(false);
     });
     return unsubscribe;
-  }, []);
-
-  if (loading) {
-    return (
-      <Container sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
-        Loading...
-      </Container>
-    );
-  }
+  }, [setIsLoading]);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      {/* Show header only if not on auth page */}
+      <LoadingSpinner />
+      
       {location.pathname !== '/' && <Header />}
       
       <Box component="main" sx={{ flexGrow: 1, py: 3 }}>
@@ -46,4 +50,4 @@ function App() {
   );
 }
 
-export default App;
+export default AppWrapper;
