@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { 
@@ -9,11 +9,15 @@ import {
   Card, 
   CardContent, 
   CircularProgress, 
-  Grid 
+  Grid,
+  List,
+  ListItem,
+  ListItemText
 } from '@mui/material';
 import { keyframes } from '@emotion/react';
 import Particles from 'react-tsparticles';
 import { loadFull } from 'tsparticles';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'; // Import the left arrow icon
 
 const pulse = keyframes`
   0% { transform: scale(1); }
@@ -23,6 +27,7 @@ const pulse = keyframes`
 
 export default function Course() {
   const { courseId } = useParams();
+  const navigate = useNavigate();
   const [chapters, setChapters] = useState([]);
   const [selectedChapter, setSelectedChapter] = useState(null);
   const [userProgress, setUserProgress] = useState(null);
@@ -122,7 +127,7 @@ export default function Course() {
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
         backdropFilter: 'blur(12px)',
         width: '100%',
-        maxWidth: '1200px',
+        maxWidth: '1800px', // Adjusted to match Home.js
         mx: 'auto',
         my: 4,
         mt: 12
@@ -133,19 +138,45 @@ export default function Course() {
           </Box>
         ) : !selectedChapter ? (
           <>
-            <Typography variant="h2" sx={{ 
-              mb: 4,
-              fontWeight: 700,
-              background: 'linear-gradient(45deg, #4B8EC9 30%, #FF9A8D 90%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              textAlign: 'center'
-            }}>
-              Course Chapters
-            </Typography>
+            {/* Back Arrow and Course Title */}
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', // Center horizontally
+                mb: 4,
+                position: 'relative', // For absolute positioning of the arrow
+              }}
+            >
+              <ArrowBackIcon
+                sx={{ 
+                  cursor: 'pointer',
+                  position: 'absolute', // Position the arrow absolutely
+                  left: 0, // Place it on the left side
+                  color: '#4B8EC9',
+                  '&:hover': {
+                    color: '#FF9A8D',
+                    transform: 'scale(1.1)',
+                    transition: 'all 0.3s ease',
+                  }
+                }}
+                onClick={() => navigate('/')} // Navigate back to home
+              />
+              <Typography variant="h2" sx={{ 
+                fontWeight: 700, 
+                background: 'linear-gradient(45deg, #4B8EC9 30%, #FF9A8D 90%)', 
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontSize: '2.5rem',
+                textAlign: 'center', // Center text horizontally
+              }}>
+                Course Chapters
+              </Typography>
+            </Box>
+
             <Grid container spacing={3}>
               {chapters.map(chapter => (
-                <Grid item xs={12} sm={6} md={4} key={chapter.id}>
+                <Grid item xs={12} sm={6} md={3} key={chapter.id}>
                   <Card sx={{ 
                     backgroundColor: 'rgba(255, 255, 255, 0.8)',
                     borderRadius: 3,
@@ -190,30 +221,41 @@ export default function Course() {
           </>
         ) : (
           <Box>
-            <Button
-              variant="contained"
-              sx={{
+            {/* Back Arrow and Chapter Title */}
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', // Center horizontally
                 mb: 4,
-                borderRadius: 2,
-                fontWeight: 600,
-                background: 'linear-gradient(45deg, #4B8EC9 30%, #FF9A8D 90%)',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                '&:hover': { boxShadow: '0 6px 8px rgba(0, 0, 0, 0.2)' }
+                position: 'relative', // For absolute positioning of the arrow
               }}
-              onClick={() => setSelectedChapter(null)}
             >
-              Back to Chapters
-            </Button>
-
-            <Typography variant="h2" sx={{ 
-              mb: 3,
-              fontWeight: 700,
-              background: 'linear-gradient(45deg, #4B8EC9 30%, #FF9A8D 90%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}>
-              {selectedChapter.title}
-            </Typography>
+              <ArrowBackIcon
+                sx={{ 
+                  cursor: 'pointer',
+                  position: 'absolute', // Position the arrow absolutely
+                  left: 0, // Place it on the left side
+                  color: '#4B8EC9',
+                  '&:hover': {
+                    color: '#FF9A8D',
+                    transform: 'scale(1.1)',
+                    transition: 'all 0.3s ease',
+                  }
+                }}
+                onClick={() => setSelectedChapter(null)} // Go back to chapters list
+              />
+              <Typography variant="h2" sx={{ 
+                fontWeight: 700, 
+                background: 'linear-gradient(45deg, #4B8EC9 30%, #FF9A8D 90%)', 
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontSize: '2.5rem',
+                textAlign: 'center', // Center text horizontally
+              }}>
+                {selectedChapter.title}
+              </Typography>
+            </Box>
 
             <Card sx={{ 
               backgroundColor: 'rgba(255, 255, 255, 0.9)',

@@ -224,7 +224,7 @@ export default function Home() {
           ) : (
             <Grid container spacing={4}>
               {courses.map(course => (
-                <Grid item xs={12} sm={selectedCourse ? 6 : 4} key={course.id}>
+                <Grid item xs={12} sm={selectedCourse ? 6 : 3} key={course.id}>
                   <Card 
                     className="course-card" // Add a class to identify course cards
                     sx={{ 
