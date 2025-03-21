@@ -79,10 +79,23 @@ export default function Header() {
           {/* Profile Section */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             {auth.currentUser?.photoURL && (
-              <Avatar 
-                src={auth.currentUser.photoURL}
-                sx={{ width: 36, height: 36 }}
-              />
+              <Box
+                sx={{
+                  border: '2px solid transparent',
+                  borderRadius: '50%', // Makes the border circular
+                  background: 'linear-gradient(225deg, #4B8EC9, rgb(212, 139, 129)) border-box', // Gradient border
+                  padding: '2px', // Adds space between the border and the Avatar
+                }}
+              >
+                <Avatar 
+                  src={auth.currentUser.photoURL}
+                  sx={{ 
+                    width: 36, 
+                    height: 36,
+                    border: '2px solid white', // Inner border to separate from gradient
+                  }}
+                />
+              </Box>
             )}
             <Typography 
               variant="subtitle1" 
