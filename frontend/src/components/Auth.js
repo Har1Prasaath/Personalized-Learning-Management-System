@@ -115,7 +115,7 @@ export default function Auth() {
           color: '#2D3748',
           textAlign: 'center',
           position: 'absolute',
-          top: '15%',
+          top: '10%',
           zIndex: 2,
           width: '100%',
           fontSize: { xs: '2rem', sm: '2.5rem' },
@@ -191,7 +191,7 @@ export default function Auth() {
           width: '100%',
           maxWidth: '400px',
           mx: 'auto',
-          marginTop: '80px'
+          marginTop: '30px'
         }}
       >
         <Typography
