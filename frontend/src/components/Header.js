@@ -29,10 +29,12 @@ export default function Header() {
         background: 'linear-gradient(45deg, #4B8EC9 45%,rgb(212, 139, 129) 90%)',
         color: 'white',
         zIndex: (theme) => theme.zIndex.drawer + 2,
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        fontFamily: 'Poppins, sans-serif', // Apply Poppins to the entire AppBar
       }}
     >
       <Toolbar>
+        {/* Header Title */}
         <Typography
           variant="h6"
           component="div"
@@ -41,6 +43,8 @@ export default function Header() {
             cursor: 'pointer',
             fontWeight: 700,
             letterSpacing: '0.5px',
+            fontSize: '1.25rem', // Slightly larger font size
+            fontFamily: 'Playfair Display, serif', // Apply Playfair Display
             '&:hover': {
               opacity: 0.9
             }
@@ -50,8 +54,8 @@ export default function Header() {
           Personalized Learning Management System
         </Typography>
         
-        {/* Increased gap between elements */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}> {/* Changed gap to 4 */}
+        {/* Right-aligned Icons and Buttons */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
           {/* Home Icon */}
           <IconButton
             color="inherit"
@@ -80,7 +84,14 @@ export default function Header() {
                 sx={{ width: 36, height: 36 }}
               />
             )}
-            <Typography variant="subtitle1" sx={{ color: 'white' }}>
+            <Typography 
+              variant="subtitle1" 
+              sx={{ 
+                color: 'white',
+                fontFamily: 'Poppins, sans-serif', // Apply Poppins
+                fontWeight: 500, // Medium weight for better readability
+              }}
+            >
               {auth.currentUser?.displayName}
             </Typography>
           </Box>
@@ -92,6 +103,7 @@ export default function Header() {
             sx={{ 
               fontWeight: 600,
               px: 2,
+              fontFamily: 'Poppins, sans-serif', // Apply Poppins
               '&:hover': { 
                 backgroundColor: 'rgba(255,255,255,0.1)',
                 transform: 'translateY(-1px)'
