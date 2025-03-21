@@ -7,6 +7,7 @@ import { keyframes } from '@emotion/react';
 import Particles from 'react-tsparticles';
 import { loadFull } from 'tsparticles';
 import Header from './Header';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'; // Import the left arrow icon
 
 const pulse = keyframes`
   0% { transform: scale(1); }
@@ -291,94 +292,119 @@ export default function Home() {
 
         {/* Right Box: Selected Course Details */}
         {selectedCourse && (
-          <Box
-            ref={detailsBoxRef}
-            sx={{
-              flex: 0.35,
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              borderRadius: 4,
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-              backdropFilter: 'blur(12px)',
-              p: 4,
-              animation: `${slideIn} 0.3s ease-out`,
-              overflowY: 'auto',
-              zIndex: 2,
-            }}
-          >
-            {courses.find(c => c.id === selectedCourse) && (
-              <>
+        <Box
+          ref={detailsBoxRef}
+          sx={{
+            flex: 0.35,
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            borderRadius: 4,
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+            backdropFilter: 'blur(12px)',
+            p: 4,
+            animation: `${slideIn} 0.3s ease-out`,
+            overflowY: 'auto',
+            zIndex: 2,
+          }}
+        >
+          {courses.find(c => c.id === selectedCourse) && (
+            <>
+              {/* Back Arrow and Course Title */}
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', // Center horizontally
+                  mb: 4,
+                  position: 'relative', // For absolute positioning of the arrow
+                }}
+              >
+                <ArrowBackIcon
+                  sx={{ 
+                    cursor: 'pointer',
+                    position: 'absolute', // Position the arrow absolutely
+                    left: 0, // Place it on the left side
+                    color: '#4B8EC9',
+                    '&:hover': {
+                      color: '#FF9A8D',
+                      transform: 'scale(1.1)',
+                      transition: 'all 0.3s ease',
+                    }
+                  }}
+                  onClick={handleCloseDetails} // Close details when clicked
+                />
                 <Typography variant="h2" sx={{ 
-                  mb: 4, 
                   fontWeight: 700, 
                   background: 'linear-gradient(45deg, #4B8EC9 30%, #FF9A8D 90%)', 
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
-                  textAlign: 'center',
-                  fontSize: '2.5rem'
+                  fontSize: '2.5rem',
+                  textAlign: 'center', // Center text horizontally
                 }}>
                   {courses.find(c => c.id === selectedCourse).title}
                 </Typography>
-                <Typography variant="body1" sx={{ 
-                  mb: 4, 
-                  color: 'text.secondary',
-                  textAlign: 'center'
-                }}>
-                  {courses.find(c => c.id === selectedCourse).description}
-                </Typography>
-                
-                <Typography variant="h4" sx={{ 
-                  mb: 3, 
-                  fontWeight: 600, 
-                  color: 'text.primary',
-                  textAlign: 'center'
-                }}>
-                  Chapters
-                </Typography>
-                <List>
-                  {chapters.map((chapter, index) => (
-                    <ListItem key={chapter.id} sx={{ 
-                      backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                      borderRadius: 2,
-                      mb: 1,
-                      transition: 'all 0.2s ease',
-                      '&:hover': {
-                        transform: 'translateX(5px)',
-                        backgroundColor: 'rgba(0, 0, 0, 0.08)'
-                      }
-                    }}>
-                      <ListItemText
-                        primary={`Chapter ${index + 1}: ${chapter.title}`}
-                        secondary={chapter.description}
-                      />
-                    </ListItem>
-                  ))}
-                </List>
+              </Box>
 
-                {/* Start Course Button */}
-                <Button
-                  fullWidth
-                  variant="contained"
-                  onClick={() => navigate(`/courses/${selectedCourse}`)}
-                  sx={{
-                    mt: 4,
-                    py: 1.5,
+              <Typography variant="body1" sx={{ 
+                mb: 4, 
+                color: 'text.secondary',
+                textAlign: 'center'
+              }}>
+                {courses.find(c => c.id === selectedCourse).description}
+              </Typography>
+              
+              <Typography variant="h4" sx={{ 
+                mb: 3, 
+                fontWeight: 600, 
+                color: 'text.primary',
+                textAlign: 'center'
+              }}>
+                Chapters
+              </Typography>
+              <List>
+                {chapters.map((chapter, index) => (
+                  <ListItem key={chapter.id} sx={{ 
+                    backgroundColor: 'rgba(0, 0, 0, 0.05)',
                     borderRadius: 2,
-                    fontWeight: 600,
-                    background: 'linear-gradient(45deg, #4B8EC9 30%, #FF9A8D 90%)',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.3s ease',
+                    mb: 1,
+                    transition: 'all 0.2s ease',
                     '&:hover': {
-                      animation: `${pulse} 1s infinite`,
-                      boxShadow: '0 6px 8px rgba(0, 0, 0, 0.2)'
+                      transform: 'translateX(5px)',
+                      backgroundColor: 'rgba(0, 0, 0, 0.08)'
                     }
-                  }}
-                >
-                  Start Course
-                </Button>
-              </>
-            )}
-          </Box>
-        )}
+                  }}>
+                    <ListItemText
+                      primary={`Chapter ${index + 1}: ${chapter.title}`}
+                      secondary={chapter.description}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+
+              {/* Start Course Button */}
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={() => navigate(`/courses/${selectedCourse}`)}
+                sx={{
+                  mt: 4,
+                  py: 1.5,
+                  borderRadius: 2,
+                  fontWeight: 600,
+                  background: 'linear-gradient(45deg, #4B8EC9 30%, #FF9A8D 90%)',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    animation: `${pulse} 1s infinite`,
+                    boxShadow: '0 6px 8px rgba(0, 0, 0, 0.2)'
+                  }
+                }}
+              >
+                Start Course
+              </Button>
+            </>
+          )}
+        </Box>
+      )}
       </Box>
     </Box>
   );
