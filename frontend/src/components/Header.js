@@ -4,6 +4,7 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { ReactComponent as HomeIcon } from '../assets/home-icon.svg';
+import { Avatar } from '@mui/material';
 
 export default function Header() {
   const navigate = useNavigate();
@@ -49,7 +50,9 @@ export default function Header() {
           Personalized Learning Management System
         </Typography>
         
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        {/* Increased gap between elements */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}> {/* Changed gap to 4 */}
+          {/* Home Icon */}
           <IconButton
             color="inherit"
             onClick={handleHomeClick}
@@ -69,6 +72,20 @@ export default function Header() {
             }} />
           </IconButton>
 
+          {/* Profile Section */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            {auth.currentUser?.photoURL && (
+              <Avatar 
+                src={auth.currentUser.photoURL}
+                sx={{ width: 36, height: 36 }}
+              />
+            )}
+            <Typography variant="subtitle1" sx={{ color: 'white' }}>
+              {auth.currentUser?.displayName}
+            </Typography>
+          </Box>
+
+          {/* Logout Button */}
           <Button 
             color="inherit" 
             onClick={handleLogout}

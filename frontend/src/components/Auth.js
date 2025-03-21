@@ -1,6 +1,10 @@
-// Auth.js
 import React, { useState, useCallback } from 'react';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  signInWithPopup,  // Add this for Google Auth
+  GoogleAuthProvider  // Add this for Google Auth
+} from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -17,6 +21,7 @@ import { keyframes } from '@emotion/react';
 import Particles from 'react-tsparticles';
 import { loadFull } from 'tsparticles';
 import { useLoading } from '../context/LoadingContext';
+import GoogleIcon from '@mui/icons-material/Google';  // Add this for Google button
 
 const fadeIn = keyframes`
   from { 
@@ -59,13 +64,28 @@ export default function Auth() {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      navigate('/home');
+    } catch (error) {
+      alert(getAuthErrorMessage(error.code));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const getAuthErrorMessage = (code) => {
     switch (code) {
-      case 'auth/invalid-email': return 'Invalid email format';
-      case 'auth/email-already-in-use': return 'Email already in use';
-      case 'auth/weak-password': return 'Password should be at least 6 characters';
-      case 'auth/user-not-found': return 'User not found';
-      case 'auth/wrong-password': return 'Incorrect password';
+      // Existing cases...
+      case 'auth/popup-closed-by-user':
+        return 'Sign-in process was cancelled';
+      case 'auth/account-exists-with-different-credential':
+        return 'Account exists with different login method';
+      case 'auth/unauthorized-domain':
+        return 'Unauthorized domain for authentication';
       default: return 'Authentication failed. Please try again';
     }
   };
@@ -86,6 +106,7 @@ export default function Auth() {
         backgroundColor: '#F8FAFC',
       }}
     >
+      {/* Title */}
       <Typography
         variant="h3"
         sx={{
@@ -103,36 +124,23 @@ export default function Auth() {
       >
         Personalized Learning Management System
       </Typography>
-
+  
+      {/* Particles Background */}
       <Particles
         id="tsparticles"
         init={particlesInit}
         options={{
-          background: { 
-            color: { 
-              value: '#F8FAFC' 
-            } 
-          },
+          background: { color: { value: '#F8FAFC' } },
           fpsLimit: 60,
           interactivity: {
             events: {
-              onHover: {
-                enable: true,
-                mode: 'repulse',
-              },
+              onHover: { enable: true, mode: 'repulse' },
               resize: true,
             },
-            modes: {
-              repulse: {
-                distance: 100,
-                duration: 0.4,
-              },
-            },
+            modes: { repulse: { distance: 100, duration: 0.4 } },
           },
           particles: {
-            color: {
-              value: ['#4B8EC9', '#FF9A8D', '#6C5CE7'],
-            },
+            color: { value: ['#4B8EC9', '#FF9A8D', '#6C5CE7'] },
             links: {
               color: '#4B8EC9',
               distance: 150,
@@ -140,35 +148,17 @@ export default function Auth() {
               opacity: 0.4,
               width: 1,
             },
-            collisions: {
-              enable: true,
-            },
+            collisions: { enable: true },
             move: {
               direction: 'none',
               enable: true,
-              outModes: {
-                default: 'bounce',
-              },
-              random: false,
+              outModes: { default: 'bounce' },
               speed: 1.5,
-              straight: false,
             },
-            number: {
-              density: {
-                enable: true,
-                area: 800,
-              },
-              value: 40,
-            },
-            opacity: {
-              value: 0.5,
-            },
-            shape: {
-              type: 'circle',
-            },
-            size: {
-              value: { min: 1, max: 3 },
-            },
+            number: { density: { enable: true, area: 800 }, value: 40 },
+            opacity: { value: 0.5 },
+            shape: { type: 'circle' },
+            size: { value: { min: 1, max: 3 } },
           },
           detectRetina: true,
         }}
@@ -181,7 +171,8 @@ export default function Auth() {
           zIndex: 0,
         }}
       />
-
+  
+      {/* Auth Form Container */}
       <Container
         maxWidth="xs"
         sx={{
@@ -217,8 +208,10 @@ export default function Auth() {
         >
           {isLogin ? 'Welcome Back' : 'Create Account'}
         </Typography>
-        
+  
+        {/* Auth Form */}
         <form onSubmit={handleAuth} style={{ width: '100%' }}>
+          {/* Email Field */}
           <TextField
             fullWidth
             margin="normal"
@@ -243,7 +236,8 @@ export default function Auth() {
             }}
             onChange={(e) => setEmail(e.target.value)}
           />
-          
+  
+          {/* Password Field */}
           <TextField
             fullWidth
             margin="normal"
@@ -282,7 +276,8 @@ export default function Auth() {
             }}
             onChange={(e) => setPassword(e.target.value)}
           />
-          
+  
+          {/* Submit Button */}
           <Button
             fullWidth
             type="submit"
@@ -304,7 +299,8 @@ export default function Auth() {
           >
             {isLogin ? 'Sign In' : 'Create Account'}
           </Button>
-
+  
+          {/* Toggle Login/Signup */}
           <Typography variant="body2" sx={{ 
             mt: 2, 
             textAlign: 'center',
@@ -332,8 +328,40 @@ export default function Auth() {
               {isLogin ? 'Sign up instead' : 'Sign in instead'}
             </Button>
           </Typography>
+  
+          {/* Google Sign-In Button */}
+          <Box sx={{ mt: 3, width: '100%' }}>
+            <Typography variant="body2" sx={{ 
+              textAlign: 'center', 
+              color: 'text.secondary',
+              mb: 2
+            }}>
+              ──── OR CONTINUE WITH ────
+            </Typography>
+            
+            <Button
+              fullWidth
+              variant="contained"
+              startIcon={<GoogleIcon />}
+              onClick={handleGoogleSignIn}
+              sx={{
+                backgroundColor: '#DB4437',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: '#C23328',
+                  boxShadow: '0 3px 5px rgba(0, 0, 0, 0.2)'
+                },
+                transition: 'all 0.3s ease',
+                py: 1.2,
+                borderRadius: 2,
+                fontWeight: 600,
+                textTransform: 'none'
+              }}
+            >
+              Sign in with Google
+            </Button>
+          </Box>
         </form>
       </Container>
     </Box>
-  );
-}
+  );}
