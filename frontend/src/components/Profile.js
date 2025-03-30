@@ -1,4 +1,3 @@
-// components/Profile.js
 import { useNavigate } from 'react-router-dom';
 import React, { useEffect, useState, useCallback } from 'react';
 import { 
@@ -41,10 +40,10 @@ export default function Profile() {
   const [editOpen, setEditOpen] = useState(false);
   const [formData, setFormData] = useState({
     preferences: '',
-    goals: '',
-    strengths: '',
-    weaknesses: ''
+    goals: ''
   });
+  const [strengths, setStrengths] = useState([]);
+  const [weaknesses, setWeaknesses] = useState([]);
   const navigate = useNavigate();
 
   const particlesInit = useCallback(async (engine) => {
@@ -64,6 +63,25 @@ export default function Profile() {
           courseId: doc.id,
           ...doc.data()
         }));
+
+        // Calculate strengths and weaknesses
+        const coursesWithProgress = progressData.filter(course => course.scores?.length > 0);
+        const courseStats = coursesWithProgress.map(course => {
+          const avgScore = course.scores.reduce((a, b) => a + b, 0) / course.scores.length;
+          return {
+            courseId: course.courseId,
+            avgScore,
+            courseName: course.courseId.replace(/-/g, ' ').toUpperCase()
+          };
+        });
+
+        if (courseStats.length > 0) {
+          const maxScore = Math.max(...courseStats.map(c => c.avgScore));
+          const minScore = Math.min(...courseStats.map(c => c.avgScore));
+          
+          setStrengths(courseStats.filter(c => c.avgScore === maxScore));
+          setWeaknesses(courseStats.filter(c => c.avgScore === minScore));
+        }
 
         setUserData(userSnap.data());
         setProgressData(progressData);
@@ -269,23 +287,61 @@ export default function Profile() {
                   </Box>
 
                   <Typography variant="h5" sx={{ mb: 2, fontWeight: 600 }}>
+                    Learning Analysis
+                  </Typography>
+
+                  <Typography variant="h6" sx={{ mt: 2, color: 'text.secondary' }}>
+                    Strengths
+                  </Typography>
+                  {strengths.length > 0 ? (
+                    strengths.map((strength, index) => (
+                      <Box key={index} sx={{ mt: 1 }}>
+                        <Typography variant="body2">{strength.courseName}</Typography>
+                        <LinearProgress 
+                          variant="determinate" 
+                          value={strength.avgScore} 
+                          color="success"
+                          sx={{ height: 8, borderRadius: 4 }}
+                        />
+                        <Typography variant="caption" display="block" sx={{ mt: 0.5 }}>
+                          {Math.round(strength.avgScore)}% Average
+                        </Typography>
+                      </Box>
+                    ))
+                  ) : (
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                      No strengths identified yet
+                    </Typography>
+                  )}
+
+                  <Typography variant="h6" sx={{ mt: 3, color: 'text.secondary' }}>
+                    Weaknesses
+                  </Typography>
+                  {weaknesses.length > 0 ? (
+                    weaknesses.map((weakness, index) => (
+                      <Box key={index} sx={{ mt: 1 }}>
+                        <Typography variant="body2">{weakness.courseName}</Typography>
+                        <LinearProgress 
+                          variant="determinate" 
+                          value={weakness.avgScore} 
+                          color="error"
+                          sx={{ height: 8, borderRadius: 4 }}
+                        />
+                        <Typography variant="caption" display="block" sx={{ mt: 0.5 }}>
+                          {Math.round(weakness.avgScore)}% Average
+                        </Typography>
+                      </Box>
+                    ))
+                  ) : (
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                      No weaknesses identified yet
+                    </Typography>
+                  )}
+
+                  <Typography variant="h5" sx={{ mt: 3, fontWeight: 600 }}>
                     Learning Profile
                   </Typography>
                   <List>
-                    <ListItem>
-                      <ListItemText
-                        primary="Strengths"
-                        secondary={userData?.learnerProfile?.strengths || 'Not specified'}
-                        secondaryTypographyProps={{ color: 'text.primary' }}
-                      />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText
-                        primary="Weaknesses"
-                        secondary={userData?.learnerProfile?.weaknesses || 'Not specified'}
-                        secondaryTypographyProps={{ color: 'text.primary' }}
-                      />
-                    </ListItem>
                     <ListItem>
                       <ListItemText
                         primary="Learning Goals"
@@ -341,22 +397,6 @@ export default function Profile() {
               rows={3}
               value={formData.goals}
               onChange={(e) => setFormData({...formData, goals: e.target.value})}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              margin="normal"
-              label="Strengths"
-              fullWidth
-              value={formData.strengths}
-              onChange={(e) => setFormData({...formData, strengths: e.target.value})}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              margin="normal"
-              label="Weaknesses"
-              fullWidth
-              value={formData.weaknesses}
-              onChange={(e) => setFormData({...formData, weaknesses: e.target.value})}
               sx={{ mb: 2 }}
             />
             <TextField
