@@ -1,3 +1,4 @@
+// App.js
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -5,6 +6,7 @@ import { auth } from './firebase';
 import Home from './components/Home';
 import Auth from './components/Auth';
 import Course from './components/Course';
+import Profile from './components/Profile';
 import Header from './components/Header';
 import { Box } from '@mui/material';
 import LoadingSpinner from './components/LoadingSpinner';
@@ -41,6 +43,7 @@ function App() {
           <Route path="/" element={user ? <Navigate to="/home" /> : <Auth />} />
           <Route path="/home" element={user ? <Home /> : <Navigate to="/" />} />
           <Route path="/courses/:courseId" element={user ? <Course /> : <Navigate to="/" />} />
+          <Route path="/profile" element={user ? <Profile /> : <Navigate to="/" />} />
         </Routes>
       </Box>
     </Box>

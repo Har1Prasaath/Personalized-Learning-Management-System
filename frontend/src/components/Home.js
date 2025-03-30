@@ -7,7 +7,7 @@ import { keyframes } from '@emotion/react';
 import Particles from 'react-tsparticles';
 import { loadFull } from 'tsparticles';
 import Header from './Header';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'; // Import the left arrow icon
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const pulse = keyframes`
   0% { transform: scale(1); }
@@ -83,13 +83,12 @@ export default function Home() {
     setChapters([]);
   };
 
-  // Close details box when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
         detailsBoxRef.current &&
         !detailsBoxRef.current.contains(event.target) &&
-        !event.target.closest('.course-card') // Prevent closing if clicking on a course card
+        !event.target.closest('.course-card')
       ) {
         handleCloseDetails();
       }
@@ -107,67 +106,24 @@ export default function Home() {
         id="tsparticles"
         init={particlesInit}
         options={{
-          background: { 
-            color: { 
-              value: '#F8FAFC' 
-            } 
-          },
+          background: { color: { value: '#F8FAFC' } },
           fpsLimit: 60,
           interactivity: {
             events: {
-              onHover: {
-                enable: true,
-                mode: 'repulse',
-              },
+              onHover: { enable: true, mode: 'repulse' },
               resize: true,
             },
-            modes: {
-              repulse: {
-                distance: 100,
-                duration: 0.4,
-              },
-            },
+            modes: { repulse: { distance: 100, duration: 0.4 } },
           },
           particles: {
-            color: {
-              value: ['#4B8EC9', '#FF9A8D', '#6C5CE7'],
-            },
-            links: {
-              color: '#4B8EC9',
-              distance: 150,
-              enable: true,
-              opacity: 0.4,
-              width: 1,
-            },
-            collisions: {
-              enable: true,
-            },
-            move: {
-              direction: 'none',
-              enable: true,
-              outModes: {
-                default: 'bounce',
-              },
-              random: false,
-              speed: 1.5,
-              straight: false,
-            },
-            number: {
-              density: {
-                enable: true,
-                area: 800,
-              },
-              value: 40,
-            },
-            opacity: {
-              value: 0.5,
-            },
-            shape: {
-              type: 'circle',
-            },
-            size: {
-              value: { min: 1, max: 3 },
-            },
+            color: { value: ['#4B8EC9', '#FF9A8D', '#6C5CE7'] },
+            links: { color: '#4B8EC9', distance: 150, enable: true, opacity: 0.4, width: 1 },
+            collisions: { enable: true },
+            move: { direction: 'none', enable: true, outModes: { default: 'bounce' }, speed: 1.5 },
+            number: { density: { enable: true, area: 800 }, value: 40 },
+            opacity: { value: 0.5 },
+            shape: { type: 'circle' },
+            size: { value: { min: 1, max: 3 } },
           },
           detectRetina: true,
         }}
@@ -186,6 +142,7 @@ export default function Home() {
         mx: 'auto',
         p: 6,
         transition: 'all 0.3s ease',
+        alignItems: 'flex-start' // Align containers at the top
       }}>
         {/* Left Box: Available Courses */}
         <Box 
@@ -226,7 +183,7 @@ export default function Home() {
               {courses.map(course => (
                 <Grid item xs={12} sm={selectedCourse ? 6 : 3} key={course.id}>
                   <Card 
-                    className="course-card" // Add a class to identify course cards
+                    className="course-card"
                     sx={{ 
                       height: '100%',
                       cursor: 'pointer',
@@ -291,120 +248,142 @@ export default function Home() {
         </Box>
 
         {/* Right Box: Selected Course Details */}
-        {selectedCourse && (
-        <Box
-          ref={detailsBoxRef}
-          sx={{
-            flex: 0.35,
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            borderRadius: 4,
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-            backdropFilter: 'blur(12px)',
-            p: 4,
-            animation: `${slideIn} 0.3s ease-out`,
-            overflowY: 'auto',
-            zIndex: 2,
+{selectedCourse && (
+  <Box
+    ref={detailsBoxRef}
+    sx={{
+      flex: 0.35,
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderRadius: 4,
+      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+      backdropFilter: 'blur(12px)',
+      p: 4,
+      animation: `${slideIn} 0.3s ease-out`,
+      overflowY: 'auto',
+      overflowX: 'hidden', // Add this to prevent horizontal scroll
+      zIndex: 2,
+      maxHeight: 'calc(100vh - 200px)',
+      display: 'flex',
+      flexDirection: 'column'
+    }}
+  >
+    {courses.find(c => c.id === selectedCourse) && (
+      <>
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            mb: 4,
+            position: 'relative',
+            width: '100%', // Ensure full width
           }}
         >
-          {courses.find(c => c.id === selectedCourse) && (
-            <>
-              {/* Back Arrow and Course Title */}
-              <Box 
-                sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', // Center horizontally
-                  mb: 4,
-                  position: 'relative', // For absolute positioning of the arrow
-                }}
-              >
-                <ArrowBackIcon
-                  sx={{ 
-                    cursor: 'pointer',
-                    position: 'absolute', // Position the arrow absolutely
-                    left: 0, // Place it on the left side
-                    color: '#4B8EC9',
-                    '&:hover': {
-                      color: '#FF9A8D',
-                      transform: 'scale(1.1)',
-                      transition: 'all 0.3s ease',
-                    }
-                  }}
-                  onClick={handleCloseDetails} // Close details when clicked
-                />
-                <Typography variant="h2" sx={{ 
-                  fontWeight: 700, 
-                  background: 'linear-gradient(45deg, #4B8EC9 30%, #FF9A8D 90%)', 
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  fontSize: '2.5rem',
-                  textAlign: 'center', // Center text horizontally
-                }}>
-                  {courses.find(c => c.id === selectedCourse).title}
-                </Typography>
-              </Box>
-
-              <Typography variant="body1" sx={{ 
-                mb: 4, 
-                color: 'text.secondary',
-                textAlign: 'center'
-              }}>
-                {courses.find(c => c.id === selectedCourse).description}
-              </Typography>
-              
-              <Typography variant="h4" sx={{ 
-                mb: 3, 
-                fontWeight: 600, 
-                color: 'text.primary',
-                textAlign: 'center'
-              }}>
-                Chapters
-              </Typography>
-              <List>
-                {chapters.map((chapter, index) => (
-                  <ListItem key={chapter.id} sx={{ 
-                    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                    borderRadius: 2,
-                    mb: 1,
-                    transition: 'all 0.2s ease',
-                    '&:hover': {
-                      transform: 'translateX(5px)',
-                      backgroundColor: 'rgba(0, 0, 0, 0.08)'
-                    }
-                  }}>
-                    <ListItemText
-                      primary={`Chapter ${index + 1}: ${chapter.title}`}
-                      secondary={chapter.description}
-                    />
-                  </ListItem>
-                ))}
-              </List>
-
-              {/* Start Course Button */}
-              <Button
-                fullWidth
-                variant="contained"
-                onClick={() => navigate(`/courses/${selectedCourse}`)}
-                sx={{
-                  mt: 4,
-                  py: 1.5,
-                  borderRadius: 2,
-                  fontWeight: 600,
-                  background: 'linear-gradient(45deg, #4B8EC9 30%, #FF9A8D 90%)',
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    animation: `${pulse} 1s infinite`,
-                    boxShadow: '0 6px 8px rgba(0, 0, 0, 0.2)'
-                  }
-                }}
-              >
-                Start Course
-              </Button>
-            </>
-          )}
+          <ArrowBackIcon
+            sx={{ 
+              cursor: 'pointer',
+              position: 'absolute',
+              left: 0,
+              color: '#4B8EC9',
+              '&:hover': {
+                color: '#FF9A8D',
+                transform: 'scale(1.1)',
+                transition: 'all 0.3s ease',
+              }
+            }}
+            onClick={handleCloseDetails}
+          />
+          <Typography variant="h2" sx={{ 
+            fontWeight: 700, 
+            background: 'linear-gradient(45deg, #4B8EC9 30%, #FF9A8D 90%)', 
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            fontSize: '2.5rem',
+            textAlign: 'center',
+            width: '100%', // Ensure text doesn't overflow
+            px: 4, // Add padding to prevent text from touching edges
+            wordBreak: 'break-word' // Break long words if needed
+          }}>
+            {courses.find(c => c.id === selectedCourse).title}
+          </Typography>
         </Box>
-      )}
+
+        <Typography variant="body1" sx={{ 
+          mb: 4, 
+          color: 'text.secondary',
+          textAlign: 'center',
+          width: '100%', // Ensure full width
+          px: 2 // Add padding to prevent text overflow
+        }}>
+          {courses.find(c => c.id === selectedCourse).description}
+        </Typography>
+        
+        <Typography variant="h4" sx={{ 
+          mb: 3, 
+          fontWeight: 600, 
+          color: 'text.primary',
+          textAlign: 'center',
+          width: '100%' // Ensure full width
+        }}>
+          Chapters
+        </Typography>
+        
+        <List sx={{ 
+          flexGrow: 1, 
+          overflowY: 'auto',
+          overflowX: 'hidden', // Prevent horizontal scroll
+          mb: 2,
+          width: '100%' // Ensure full width
+        }}>
+          {chapters.map((chapter, index) => (
+            <ListItem key={chapter.id} sx={{ 
+              backgroundColor: 'rgba(0, 0, 0, 0.05)',
+              borderRadius: 2,
+              mb: 1,
+              transition: 'all 0.2s ease',
+              width: 'calc(100% - 16px)', // Account for padding
+              '&:hover': {
+                transform: 'translateX(5px)',
+                backgroundColor: 'rgba(0, 0, 0, 0.08)'
+              }
+            }}>
+              <ListItemText
+                primary={`Chapter ${index + 1}: ${chapter.title}`}
+                secondary={chapter.description}
+                sx={{
+                  width: '100%',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+              />
+            </ListItem>
+          ))}
+        </List>
+
+        <Button
+          fullWidth
+          variant="contained"
+          onClick={() => navigate(`/courses/${selectedCourse}`)}
+          sx={{
+            mt: 2,
+            py: 1.5,
+            borderRadius: 2,
+            fontWeight: 600,
+            background: 'linear-gradient(45deg, #4B8EC9 30%, #FF9A8D 90%)',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              animation: `${pulse} 1s infinite`,
+              boxShadow: '0 6px 8px rgba(0, 0, 0, 0.2)'
+            }
+          }}
+        >
+          Start Course
+        </Button>
+      </>
+    )}
+  </Box>
+)}
       </Box>
     </Box>
   );
