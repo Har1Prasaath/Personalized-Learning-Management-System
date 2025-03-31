@@ -3,7 +3,8 @@ import {
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword,
   signInWithPopup,
-  GoogleAuthProvider
+  GoogleAuthProvider,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +15,12 @@ import {
   Typography, 
   Box, 
   InputAdornment,
-  IconButton 
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Alert
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { keyframes } from '@emotion/react';
@@ -34,6 +40,10 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetSent, setResetSent] = useState(false);
+  const [error, setError] = useState(null);
   const { setIsLoading } = useLoading();
   const navigate = useNavigate();
 
@@ -46,6 +56,7 @@ export default function Auth() {
   const handleAuth = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
@@ -63,7 +74,7 @@ export default function Auth() {
       }
       navigate('/home');
     } catch (error) {
-      alert(getAuthErrorMessage(error.code));
+      setError(getAuthErrorMessage(error.code));
     } finally {
       setIsLoading(false);
     }
@@ -71,6 +82,7 @@ export default function Auth() {
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
+    setError(null);
     try {
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
@@ -86,7 +98,20 @@ export default function Auth() {
 
       navigate('/home');
     } catch (error) {
-      alert(getAuthErrorMessage(error.code));
+      setError(getAuthErrorMessage(error.code));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await sendPasswordResetEmail(auth, resetEmail);
+      setResetSent(true);
+    } catch (error) {
+      setError(getAuthErrorMessage(error.code));
     } finally {
       setIsLoading(false);
     }
@@ -94,6 +119,16 @@ export default function Auth() {
 
   const getAuthErrorMessage = (code) => {
     switch (code) {
+      case 'auth/user-not-found':
+        return 'No user found with this email address';
+      case 'auth/wrong-password':
+        return 'Incorrect password';
+      case 'auth/email-already-in-use':
+        return 'Email already in use';
+      case 'auth/weak-password':
+        return 'Password should be at least 6 characters';
+      case 'auth/invalid-email':
+        return 'Invalid email address';
       case 'auth/popup-closed-by-user':
         return 'Sign-in process was cancelled';
       case 'auth/account-exists-with-different-credential':
@@ -117,14 +152,229 @@ export default function Auth() {
           {isLogin ? 'Welcome Back' : 'Create Account'}
         </Typography>
 
+        {error && (
+          <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
         <form onSubmit={handleAuth} style={{ width: '100%' }}>
-          <TextField fullWidth margin="normal" label="Email" variant="outlined" type="email" required sx={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 2, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#E0E0E0' }, '&:hover fieldset': { borderColor: '#4B8EC9' }, '&.Mui-focused fieldset': { borderColor: '#4B8EC9' } } }} onChange={(e) => setEmail(e.target.value)} />
-          <TextField fullWidth margin="normal" label="Password" variant="outlined" type={showPassword ? 'text' : 'password'} required sx={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 2, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#E0E0E0' }, '&:hover fieldset': { borderColor: '#4B8EC9' }, '&.Mui-focused fieldset': { borderColor: '#4B8EC9' } } }} InputProps={{ endAdornment: ( <InputAdornment position="end"> <IconButton aria-label="toggle password visibility" onClick={handleClickShowPassword} edge="end" sx={{ color: 'text.secondary' }}> {showPassword ? <VisibilityOff /> : <Visibility />} </IconButton> </InputAdornment> ), }} onChange={(e) => setPassword(e.target.value)} />
-          <Button fullWidth type="submit" variant="contained" size="large" sx={{ mt: 3, py: 1.5, borderRadius: 2, fontWeight: 600, background: 'linear-gradient(45deg, #4B8EC9 30%, #FF9A8D 90%)', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', transition: 'all 0.3s ease', '&:hover': { boxShadow: '0 6px 8px rgba(0, 0, 0, 0.2)', transform: 'translateY(-1px)' } }}> {isLogin ? 'Sign In' : 'Create Account'} </Button>
-          <Typography variant="body2" sx={{ mt: 2, textAlign: 'center', color: 'text.secondary' }}> {isLogin ? "Don't have an account?" : "Already have an account?"} <Button variant="text" size="small" sx={{ ml: 1, color: 'primary.main', fontWeight: 600, textTransform: 'none', transition: 'all 0.2s ease', '&:hover': { backgroundColor: 'transparent', textDecoration: 'underline', transform: 'scale(1.05)' } }} onClick={() => setIsLogin(!isLogin)}> {isLogin ? 'Sign up instead' : 'Sign in instead'} </Button> </Typography>
-          <Box sx={{ mt: 3, width: '100%' }}> <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary', mb: 2 }}> ──── OR CONTINUE WITH ──── </Typography> <Button fullWidth variant="contained" startIcon={<GoogleIcon />} onClick={handleGoogleSignIn} sx={{ backgroundColor: '#DB4437', color: 'white', '&:hover': { backgroundColor: '#C23328', boxShadow: '0 3px 5px rgba(0, 0, 0, 0.2)' }, transition: 'all 0.3s ease', py: 1.2, borderRadius: 2, fontWeight: 600, textTransform: 'none' }}> Sign in with Google </Button> </Box>
+          <TextField 
+            fullWidth 
+            margin="normal" 
+            label="Email" 
+            variant="outlined" 
+            type="email" 
+            required 
+            sx={{ 
+              backgroundColor: 'rgba(255, 255, 255, 0.9)', 
+              borderRadius: 2, 
+              '& .MuiOutlinedInput-root': { 
+                '& fieldset': { borderColor: '#E0E0E0' }, 
+                '&:hover fieldset': { borderColor: '#4B8EC9' }, 
+                '&.Mui-focused fieldset': { borderColor: '#4B8EC9' } 
+              } 
+            }} 
+            onChange={(e) => setEmail(e.target.value)} 
+          />
+          <TextField 
+            fullWidth 
+            margin="normal" 
+            label="Password" 
+            variant="outlined" 
+            type={showPassword ? 'text' : 'password'} 
+            required 
+            sx={{ 
+              backgroundColor: 'rgba(255, 255, 255, 0.9)', 
+              borderRadius: 2, 
+              '& .MuiOutlinedInput-root': { 
+                '& fieldset': { borderColor: '#E0E0E0' }, 
+                '&:hover fieldset': { borderColor: '#4B8EC9' }, 
+                '&.Mui-focused fieldset': { borderColor: '#4B8EC9' } 
+              } 
+            }} 
+            InputProps={{ 
+              endAdornment: ( 
+                <InputAdornment position="end"> 
+                  <IconButton 
+                    aria-label="toggle password visibility" 
+                    onClick={handleClickShowPassword} 
+                    edge="end" 
+                    sx={{ color: 'text.secondary' }}
+                  > 
+                    {showPassword ? <VisibilityOff /> : <Visibility />} 
+                  </IconButton> 
+                </InputAdornment> 
+              ), 
+            }} 
+            onChange={(e) => setPassword(e.target.value)} 
+          />
+          
+          {isLogin && (
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+              <Button 
+                variant="text" 
+                size="small" 
+                sx={{ 
+                  textTransform: 'none', 
+                  color: 'text.secondary',
+                  '&:hover': { 
+                    textDecoration: 'underline',
+                    backgroundColor: 'transparent'
+                  }
+                }}
+                onClick={() => setForgotPasswordOpen(true)}
+              >
+                Forgot password?
+              </Button>
+            </Box>
+          )}
+
+          <Button 
+            fullWidth 
+            type="submit" 
+            variant="contained" 
+            size="large" 
+            sx={{ 
+              mt: 3, 
+              py: 1.5, 
+              borderRadius: 2, 
+              fontWeight: 600, 
+              background: 'linear-gradient(45deg, #4B8EC9 30%, #FF9A8D 90%)', 
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', 
+              transition: 'all 0.3s ease', 
+              '&:hover': { 
+                boxShadow: '0 6px 8px rgba(0, 0, 0, 0.2)', 
+                transform: 'translateY(-1px)' 
+              } 
+            }} 
+          > 
+            {isLogin ? 'Sign In' : 'Create Account'} 
+          </Button>
+          
+          <Typography variant="body2" sx={{ mt: 2, textAlign: 'center', color: 'text.secondary' }}> 
+            {isLogin ? "Don't have an account?" : "Already have an account?"} 
+            <Button 
+              variant="text" 
+              size="small" 
+              sx={{ 
+                ml: 1, 
+                color: 'primary.main', 
+                fontWeight: 600, 
+                textTransform: 'none', 
+                transition: 'all 0.2s ease', 
+                '&:hover': { 
+                  backgroundColor: 'transparent', 
+                  textDecoration: 'underline', 
+                  transform: 'scale(1.05)' 
+                } 
+              }} 
+              onClick={() => {
+                setIsLogin(!isLogin);
+                setError(null);
+              }}
+            > 
+              {isLogin ? 'Sign up instead' : 'Sign in instead'} 
+            </Button> 
+          </Typography>
+          
+          <Box sx={{ mt: 3, width: '100%' }}> 
+            <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary', mb: 2 }}> 
+              ──── OR CONTINUE WITH ──── 
+            </Typography> 
+            <Button 
+              fullWidth 
+              variant="contained" 
+              startIcon={<GoogleIcon />} 
+              onClick={handleGoogleSignIn} 
+              sx={{ 
+                backgroundColor: '#DB4437', 
+                color: 'white', 
+                '&:hover': { 
+                  backgroundColor: '#C23328', 
+                  boxShadow: '0 3px 5px rgba(0, 0, 0, 0.2)' 
+                }, 
+                transition: 'all 0.3s ease', 
+                py: 1.2, 
+                borderRadius: 2, 
+                fontWeight: 600, 
+                textTransform: 'none' 
+              }} 
+            > 
+              Sign in with Google 
+            </Button> 
+          </Box>
         </form>
       </Container>
+
+      {/* Forgot Password Dialog */}
+      <Dialog open={forgotPasswordOpen} onClose={() => {
+        setForgotPasswordOpen(false);
+        setResetSent(false);
+        setError(null);
+      }}>
+        <DialogTitle>Reset Password</DialogTitle>
+        <DialogContent>
+          {resetSent ? (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              Password reset email sent. Please check your inbox.
+            </Alert>
+          ) : (
+            <>
+              {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              )}
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                Enter your email address and we'll send you a link to reset your password.
+              </Typography>
+              <TextField
+                fullWidth
+                label="Email"
+                variant="outlined"
+                type="email"
+                required
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                sx={{ mt: 1 }}
+              />
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          {!resetSent && (
+            <>
+              <Button onClick={() => {
+                setForgotPasswordOpen(false);
+                setResetSent(false);
+                setError(null);
+              }}>
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleForgotPassword}
+                variant="contained"
+                disabled={!resetEmail}
+              >
+                Send Reset Link
+              </Button>
+            </>
+          )}
+          {resetSent && (
+            <Button 
+              onClick={() => {
+                setForgotPasswordOpen(false);
+                setResetSent(false);
+                setError(null);
+              }}
+              variant="contained"
+            >
+              Close
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
