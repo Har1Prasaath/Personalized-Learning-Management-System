@@ -1,14 +1,12 @@
-// frontend/src/components/Header.js
 import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, Box, IconButton, Avatar, Menu, MenuItem, ListItemIcon } from '@mui/material';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
-import { ReactComponent as HomeIcon } from '../assets/home-icon.svg';
-import PersonIcon from '@mui/icons-material/Person';
+import { ReactComponent as AdminHomeIcon } from '../assets/home-icon.svg';
 import Logout from '@mui/icons-material/Logout';
 
-export default function Header() {
+export default function AdminHeader() {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -16,14 +14,14 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigate('/');
+      navigate('/admin/login');
     } catch (error) {
       console.error('Logout error:', error);
     }
   };
 
-  const handleHomeClick = () => {
-    navigate('/home');
+  const handleDashboardClick = () => {
+    navigate('/admin/dashboard');
   };
 
   const handleProfileClick = (event) => {
@@ -34,14 +32,9 @@ export default function Header() {
     setAnchorEl(null);
   };
 
-  const navigateToProfile = () => {
-    navigate('/profile');
-    handleClose();
-  };
-
   return (
     <AppBar position="fixed" sx={{ 
-      background: 'linear-gradient(45deg, #4B8EC9 45%,rgb(212, 139, 129) 90%)', 
+      background: 'linear-gradient(45deg, #2C3E50 45%, #3498DB 90%)', 
       color: 'white', 
       zIndex: (theme) => theme.zIndex.drawer + 2, 
       boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', 
@@ -57,12 +50,12 @@ export default function Header() {
           fontFamily: 'Raleway, sans-serif',
           color: 'white',
           '&:hover': { opacity: 0.9 } 
-        }} onClick={handleHomeClick}>
-          Personalized Learning Management System
+        }} onClick={handleDashboardClick}>
+          Admin Dashboard
         </Typography>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-          <IconButton color="inherit" onClick={handleHomeClick} sx={{ 
+          <IconButton color="inherit" onClick={handleDashboardClick} sx={{ 
             p: 1, 
             '&:hover': { 
               backgroundColor: 'rgba(255,255,255,0.1)', 
@@ -70,7 +63,7 @@ export default function Header() {
             }, 
             transition: 'all 0.2s ease' 
           }}>
-            <HomeIcon style={{ width: 28, height: 28, fill: 'currentColor' }} />
+            <AdminHomeIcon style={{ width: 28, height: 28, fill: 'currentColor' }} />
           </IconButton>
 
           <Box 
@@ -87,14 +80,14 @@ export default function Header() {
               <Box sx={{ 
                 border: '2px solid transparent', 
                 borderRadius: '50%', 
-                background: 'linear-gradient(225deg, #4B8EC9, rgb(212, 139, 129)) border-box', 
+                background: 'linear-gradient(225deg, #2C3E50, #3498DB) border-box', 
                 padding: '2px' 
               }}>
                 <Avatar src={auth.currentUser.photoURL} sx={{ width: 36, height: 36, border: '2px solid white' }} />
               </Box>
             )}
             <Typography variant="subtitle1" sx={{ color: 'white', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>
-              {auth.currentUser?.displayName}
+              {auth.currentUser?.displayName || 'Admin'}
             </Typography>
           </Box>
 
@@ -117,12 +110,6 @@ export default function Header() {
               },
             }}
           >
-            <MenuItem onClick={navigateToProfile}>
-              <ListItemIcon>
-                <PersonIcon fontSize="small" />
-              </ListItemIcon>
-              Learner Profile
-            </MenuItem>
             <MenuItem onClick={handleLogout}>
               <ListItemIcon>
                 <Logout fontSize="small" />

@@ -69,6 +69,7 @@ export default function Auth() {
           email: user.email,
           displayName: user.displayName || '',
           photoURL: user.photoURL || '',
+          role: 'user', // Add this line
           createdAt: new Date(),
         });
       }
@@ -93,6 +94,7 @@ export default function Auth() {
         email: user.email,
         displayName: user.displayName || '',
         photoURL: user.photoURL || '',
+        role: 'user', // Add this line
         createdAt: new Date(),
       });
 
@@ -303,6 +305,25 @@ export default function Auth() {
             > 
               Sign in with Google 
             </Button> 
+            <Button 
+  fullWidth 
+  variant="outlined" 
+  onClick={() => navigate('/admin/login')}
+  sx={{ 
+    mt: 2,
+    py: 1.2,
+    borderRadius: 2,
+    fontWeight: 600,
+    borderColor: '#4B8EC9',
+    color: '#4B8EC9',
+    '&:hover': { 
+      backgroundColor: 'rgba(75, 142, 201, 0.1)',
+      borderColor: '#3B6E9B'
+    }
+  }}
+>
+  Login as Admin
+</Button>
           </Box>
         </form>
       </Container>
