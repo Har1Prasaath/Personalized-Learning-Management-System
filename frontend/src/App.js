@@ -6,10 +6,11 @@ import { auth } from './firebase';
 import Home from './components/Home';
 import Auth from './components/Auth';
 import Course from './components/Course';
+import Profile from './components/Profile';
 import Header from './components/Header';
-import { Box, Container } from '@mui/material';
+import { Box } from '@mui/material';
 import LoadingSpinner from './components/LoadingSpinner';
-import { LoadingProvider, useLoading } from './context/LoadingContext'; // Add this import
+import { LoadingProvider, useLoading } from './context/LoadingContext';
 
 function AppWrapper() {
   return (
@@ -21,7 +22,7 @@ function AppWrapper() {
 
 function App() {
   const [user, setUser] = useState(null);
-  const { setIsLoading } = useLoading(); // Now this is defined
+  const { setIsLoading } = useLoading();
   const location = useLocation();
 
   useEffect(() => {
@@ -36,14 +37,13 @@ function App() {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <LoadingSpinner />
-      
       {location.pathname !== '/' && <Header />}
-      
       <Box component="main" sx={{ flexGrow: 1, py: 3 }}>
         <Routes>
           <Route path="/" element={user ? <Navigate to="/home" /> : <Auth />} />
           <Route path="/home" element={user ? <Home /> : <Navigate to="/" />} />
           <Route path="/courses/:courseId" element={user ? <Course /> : <Navigate to="/" />} />
+          <Route path="/profile" element={user ? <Profile /> : <Navigate to="/" />} />
         </Routes>
       </Box>
     </Box>

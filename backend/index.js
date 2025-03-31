@@ -4,13 +4,9 @@ const cors = require('cors');
 const { admin, db } = require('./firebase');
 
 const app = express();
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true
-}));
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(express.json());
 
-// Authentication middleware
 const authenticate = async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).send('Unauthorized');
@@ -24,7 +20,6 @@ const authenticate = async (req, res, next) => {
   }
 };
 
-// Progress Update Endpoint
 app.post('/api/update-progress', authenticate, async (req, res) => {
   try {
     const { courseId, chapterId, score } = req.body;
@@ -35,7 +30,6 @@ app.post('/api/update-progress', authenticate, async (req, res) => {
 
     const currentProgress = (await userProgressRef.get()).data() || {};
     
-    // Update difficulty based on score
     let newDifficulty = currentProgress.difficulty || 'beginner';
     if(score >= 80) newDifficulty = 'advanced';
     else if(score >= 50) newDifficulty = 'intermediate';
@@ -55,20 +49,17 @@ app.post('/api/update-progress', authenticate, async (req, res) => {
   }
 });
 
-// Course Content Endpoint
 app.get('/api/courses/:courseId', authenticate, async (req, res) => {
   try {
     const userId = req.user.uid;
     const courseId = req.params.courseId;
     
-    // Get user's current difficulty
     const progressRef = db.collection('users').doc(userId).collection('progress').doc(courseId);
     const progressDoc = await progressRef.get();
     
     const difficulty = progressDoc.exists ? 
       progressDoc.data().difficulty : 'beginner';
 
-    // Get appropriate content
     const contentRef = db.collection('courses').doc(courseId)
       .collection('content').where('difficulty', '==', difficulty);
     const snapshot = await contentRef.get();
