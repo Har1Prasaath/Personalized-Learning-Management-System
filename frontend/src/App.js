@@ -7,7 +7,6 @@ import Home from './components/Home';
 import Auth from './components/Auth';
 import Course from './components/Course';
 import Profile from './components/Profile';
-import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
 import Header from './components/Header';
 import AdminHeader from './components/AdminHeader';
@@ -64,7 +63,6 @@ function App() {
         <Routes>
           {/* Public routes */}
           <Route path="/" element={user ? <Navigate to={getRedirectPath()} /> : <Auth />} />
-          <Route path="/admin/login" element={user ? <Navigate to={getRedirectPath()} /> : <AdminLogin />} />
 
           {/* User routes */}
           <Route path="/home" element={

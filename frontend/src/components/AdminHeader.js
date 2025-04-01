@@ -14,7 +14,7 @@ export default function AdminHeader() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigate('/admin/login');
+      navigate('/');
     } catch (error) {
       console.error('Logout error:', error);
     }

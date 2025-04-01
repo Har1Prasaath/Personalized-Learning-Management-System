@@ -16,7 +16,7 @@ import {
   Avatar,
   Chip
 } from '@mui/material';
-import Header from './Header';
+import AdminHeader from './AdminHeader';
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
@@ -73,7 +73,7 @@ export default function AdminDashboard() {
 
   return (
     <Box sx={{ width: '100%', minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
-      <Header />
+      <AdminHeader />
       
       <Box sx={{ p: 4, mt: 8 }}>
         <Typography variant="h3" sx={{ mb: 4, fontWeight: 700, color: '#2D3748' }}>

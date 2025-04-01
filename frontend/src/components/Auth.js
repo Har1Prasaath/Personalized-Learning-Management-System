@@ -20,7 +20,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { keyframes } from '@emotion/react';
@@ -28,7 +29,7 @@ import Particles from 'react-tsparticles';
 import { loadFull } from 'tsparticles';
 import { useLoading } from '../context/LoadingContext';
 import GoogleIcon from '@mui/icons-material/Google';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
@@ -59,21 +60,23 @@ export default function Auth() {
     setError(null);
     try {
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
+        const role = userDoc.data().role;
+        navigate(role === 'admin' ? '/admin/dashboard' : '/home');
       } else {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Create user document in Firestore
         await setDoc(doc(db, 'users', user.uid), {
           email: user.email,
           displayName: user.displayName || '',
           photoURL: user.photoURL || '',
-          role: 'user', // Add this line
+          role: 'user',
           createdAt: new Date(),
         });
+        navigate('/home');
       }
-      navigate('/home');
     } catch (error) {
       setError(getAuthErrorMessage(error.code));
     } finally {
@@ -89,16 +92,20 @@ export default function Auth() {
       const userCredential = await signInWithPopup(auth, provider);
       const user = userCredential.user;
 
-      // Create user document in Firestore
-      await setDoc(doc(db, 'users', user.uid), {
-        email: user.email,
-        displayName: user.displayName || '',
-        photoURL: user.photoURL || '',
-        role: 'user', // Add this line
-        createdAt: new Date(),
-      });
-
-      navigate('/home');
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        const role = userDoc.data().role;
+        navigate(role === 'admin' ? '/admin/dashboard' : '/home');
+      } else {
+        await setDoc(doc(db, 'users', user.uid), {
+          email: user.email,
+          displayName: user.displayName || '',
+          photoURL: user.photoURL || '',
+          role: 'user',
+          createdAt: new Date(),
+        });
+        navigate('/home');
+      }
     } catch (error) {
       setError(getAuthErrorMessage(error.code));
     } finally {
@@ -305,25 +312,6 @@ export default function Auth() {
             > 
               Sign in with Google 
             </Button> 
-            <Button 
-  fullWidth 
-  variant="outlined" 
-  onClick={() => navigate('/admin/login')}
-  sx={{ 
-    mt: 2,
-    py: 1.2,
-    borderRadius: 2,
-    fontWeight: 600,
-    borderColor: '#4B8EC9',
-    color: '#4B8EC9',
-    '&:hover': { 
-      backgroundColor: 'rgba(75, 142, 201, 0.1)',
-      borderColor: '#3B6E9B'
-    }
-  }}
->
-  Login as Admin
-</Button>
           </Box>
         </form>
       </Container>
