@@ -20,7 +20,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { keyframes } from '@emotion/react';
@@ -28,7 +29,7 @@ import Particles from 'react-tsparticles';
 import { loadFull } from 'tsparticles';
 import { useLoading } from '../context/LoadingContext';
 import GoogleIcon from '@mui/icons-material/Google';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
@@ -59,20 +60,23 @@ export default function Auth() {
     setError(null);
     try {
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
+        const role = userDoc.data().role;
+        navigate(role === 'admin' ? '/admin/dashboard' : '/home');
       } else {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Create user document in Firestore
         await setDoc(doc(db, 'users', user.uid), {
           email: user.email,
           displayName: user.displayName || '',
           photoURL: user.photoURL || '',
+          role: 'user',
           createdAt: new Date(),
         });
+        navigate('/home');
       }
-      navigate('/home');
     } catch (error) {
       setError(getAuthErrorMessage(error.code));
     } finally {
@@ -88,15 +92,20 @@ export default function Auth() {
       const userCredential = await signInWithPopup(auth, provider);
       const user = userCredential.user;
 
-      // Create user document in Firestore
-      await setDoc(doc(db, 'users', user.uid), {
-        email: user.email,
-        displayName: user.displayName || '',
-        photoURL: user.photoURL || '',
-        createdAt: new Date(),
-      });
-
-      navigate('/home');
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        const role = userDoc.data().role;
+        navigate(role === 'admin' ? '/admin/dashboard' : '/home');
+      } else {
+        await setDoc(doc(db, 'users', user.uid), {
+          email: user.email,
+          displayName: user.displayName || '',
+          photoURL: user.photoURL || '',
+          role: 'user',
+          createdAt: new Date(),
+        });
+        navigate('/home');
+      }
     } catch (error) {
       setError(getAuthErrorMessage(error.code));
     } finally {
@@ -148,7 +157,7 @@ export default function Auth() {
       <Particles id="tsparticles" init={particlesInit} options={{ background: { color: { value: '#F8FAFC' } }, fpsLimit: 60, interactivity: { events: { onHover: { enable: true, mode: 'repulse' }, resize: true }, modes: { repulse: { distance: 100, duration: 0.4 } } }, particles: { color: { value: ['#4B8EC9', '#FF9A8D', '#6C5CE7'] }, links: { color: '#4B8EC9', distance: 150, enable: true, opacity: 0.4, width: 1 }, collisions: { enable: true }, move: { direction: 'none', enable: true, outModes: { default: 'bounce' }, speed: 1.5 }, number: { density: { enable: true, area: 800 }, value: 40 }, opacity: { value: 0.5 }, shape: { type: 'circle' }, size: { value: { min: 1, max: 3 } } }, detectRetina: true }} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }} />
 
       <Container maxWidth="xs" sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255, 255, 255, 0.95)', borderRadius: 4, p: 4, boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)', backdropFilter: 'blur(12px)', animation: `${fadeIn} 0.6s ease-out`, width: '100%', maxWidth: '400px', mx: 'auto', marginTop: '30px' }}>
-        <Typography variant="h4" gutterBottom sx={{ color: 'text.primary', mb: 3, fontWeight: 700, background: 'linear-gradient(45deg, #4B8EC9 30%, #FF9A8D 90%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+        <Typography variant="h2" gutterBottom sx={{ color: 'text.primary', mb: 3, fontWeight: 700, background: 'linear-gradient(45deg, #4B8EC9 30%, #FF9A8D 90%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
           {isLogin ? 'Welcome Back' : 'Create Account'}
         </Typography>
 
@@ -211,7 +220,7 @@ export default function Auth() {
           />
           
           {isLogin && (
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 0.5 }}>
               <Button 
                 variant="text" 
                 size="small" 
@@ -236,7 +245,7 @@ export default function Auth() {
             variant="contained" 
             size="large" 
             sx={{ 
-              mt: 3, 
+              mt: 1, 
               py: 1.5, 
               borderRadius: 2, 
               fontWeight: 600, 
@@ -278,7 +287,7 @@ export default function Auth() {
             </Button> 
           </Typography>
           
-          <Box sx={{ mt: 3, width: '100%' }}> 
+          <Box sx={{ mt: 0.5, width: '100%' }}> 
             <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary', mb: 2 }}> 
               ──── OR CONTINUE WITH ──── 
             </Typography> 
