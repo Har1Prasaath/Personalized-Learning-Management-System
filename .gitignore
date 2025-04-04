@@ -10,7 +10,9 @@ Personalized-Learning-Management-System/frontend/.env
 Personalized-Learning-Management-System/backend/serviceAccountKey.json
 Personalized-Learning-Management-System\backend\serviceAccountKey.json
 
+
 # General ignores
 node_modules/
 .env
 backend/serviceAccountKey.json
+backend/firestorerules.txt
