@@ -32,6 +32,8 @@ import {
 import AdminHeader from './AdminHeader';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import PersonIcon from '@mui/icons-material/Person';
+import Grid from '@mui/material/Grid';
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
@@ -41,6 +43,8 @@ export default function AdminDashboard() {
   const [progressDialogOpen, setProgressDialogOpen] = useState(false);
   const [userProgress, setUserProgress] = useState(null);
   const [loadingProgress, setLoadingProgress] = useState(false);
+  const [userDetailsDialogOpen, setUserDetailsDialogOpen] = useState(false);
+  const [selectedUserForDetails, setSelectedUserForDetails] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -148,6 +152,16 @@ export default function AdminDashboard() {
     setUserProgress(null);
   };
 
+  const handleUserRowClick = (user) => {
+    setSelectedUserForDetails(user);
+    setUserDetailsDialogOpen(true);
+  };
+
+  const handleCloseUserDetailsDialog = () => {
+    setUserDetailsDialogOpen(false);
+    setSelectedUserForDetails(null);
+  };
+
   // Shared table rendering function
   const renderTable = (data, title) => {
     const isAdminTable = title === 'Admins';
@@ -179,11 +193,13 @@ export default function AdminDashboard() {
               {data.map((user) => (
                 <TableRow 
                   key={user.id}
+                  onClick={() => !isAdminTable && handleUserRowClick(user)}
                   sx={{ 
                     backgroundColor: user.isAdmin ? 'rgba(75, 142, 201, 0.05)' : 'inherit',
                     '&:hover': { 
                       backgroundColor: user.isAdmin ? 'rgba(75, 142, 201, 0.1)' : 'rgba(0, 0, 0, 0.04)'
-                    }
+                    },
+                    cursor: !isAdminTable ? 'pointer' : 'default'
                   }}
                 >
                   <TableCell align="center">
@@ -216,7 +232,10 @@ export default function AdminDashboard() {
                         color="primary" 
                         size="small"
                         startIcon={<AssessmentIcon />}
-                        onClick={() => handleViewProgress(user)}
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent row click when clicking button
+                          handleViewProgress(user);
+                        }}
                         disabled={user.totalCourses === 0}
                         sx={{
                           borderRadius: 2,
@@ -421,6 +440,228 @@ export default function AdminDashboard() {
             sx={{ borderRadius: 2, textTransform: 'none' }}
           >
             Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* User Details Dialog */}
+      <Dialog
+        open={userDetailsDialogOpen}
+        onClose={handleCloseUserDetailsDialog}
+        fullWidth
+        maxWidth="md"
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            maxHeight: '90vh'
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          bgcolor: '#4B8EC9', 
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1
+        }}>
+          <PersonIcon />
+          User Profile: {selectedUserForDetails?.displayName || 'User'}
+        </DialogTitle>
+        <DialogContent dividers sx={{ p: 3 }}>
+          {selectedUserForDetails && (
+            <Box>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                mb: 4,
+                pb: 3,
+                borderBottom: '1px solid rgba(0, 0, 0, 0.12)'
+              }}>
+                <Avatar 
+                  src={selectedUserForDetails.photoURL} 
+                  sx={{ width: 100, height: 100, mr: 3 }}
+                />
+                <Box>
+                  <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                    {selectedUserForDetails.displayName || 'Anonymous'}
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary">
+                    {selectedUserForDetails.email}
+                  </Typography>
+                  <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Chip label={selectedUserForDetails.isAdmin ? "Admin" : "User"} color="primary" size="small" />
+                    {selectedUserForDetails.lastLogin?.toDate && (
+                      <Typography variant="caption">
+                        Last active: {new Date(selectedUserForDetails.lastLogin.toDate()).toLocaleDateString()}
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
+              </Box>
+              
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={6}>
+                  <Paper elevation={0} variant="outlined" sx={{ p: 2, borderRadius: 2, height: '100%' }}>
+                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Personal Information</Typography>
+                    <List dense>
+                      <ListItem>
+                        <ListItemText 
+                          primary="Full Name" 
+                          secondary={selectedUserForDetails.displayName || 'Not specified'} 
+                        />
+                      </ListItem>
+                      <ListItem>
+                        <ListItemText 
+                          primary="Phone" 
+                          secondary={selectedUserForDetails.phone || 'Not specified'} 
+                        />
+                      </ListItem>
+                      <ListItem>
+                        <ListItemText 
+                          primary="Bio" 
+                          secondary={selectedUserForDetails.bio || 'Not specified'} 
+                        />
+                      </ListItem>
+                      <ListItem>
+                        <ListItemText 
+                          primary="Account Created" 
+                          secondary={selectedUserForDetails.createdAt?.toDate ? 
+                            new Date(selectedUserForDetails.createdAt.toDate()).toLocaleString() : 
+                            'Unknown'
+                          } 
+                        />
+                      </ListItem>
+                    </List>
+                  </Paper>
+                </Grid>
+                
+                <Grid item xs={12} md={6}>
+                  <Paper elevation={0} variant="outlined" sx={{ p: 2, borderRadius: 2, height: '100%' }}>
+                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Learning Profile</Typography>
+                    <List dense>
+                      <ListItem>
+                        <ListItemText 
+                          primary="Learning Goals" 
+                          secondary={selectedUserForDetails.learnerProfile?.goals || 'Not specified'} 
+                        />
+                      </ListItem>
+                      <ListItem>
+                        <ListItemText 
+                          primary="Preferences" 
+                          secondary={selectedUserForDetails.learnerProfile?.preferences || 'Not specified'} 
+                        />
+                      </ListItem>
+                      <ListItem>
+                        <ListItemText 
+                          primary="Total Courses" 
+                          secondary={`${selectedUserForDetails.totalCourses} courses enrolled`} 
+                        />
+                      </ListItem>
+                      <ListItem>
+                        <ListItemText 
+                          primary="Performance" 
+                          secondary={
+                            <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
+                              <LinearProgress
+                                variant="determinate"
+                                value={selectedUserForDetails.avgScore || 0}
+                                color={getScoreColor(selectedUserForDetails.avgScore || 0)}
+                                sx={{ height: 8, borderRadius: 4, flexGrow: 1, mr: 2 }}
+                              />
+                              <Typography variant="body2" fontWeight={600}>
+                                {selectedUserForDetails.avgScore.toFixed(1)}%
+                              </Typography>
+                            </Box>
+                          } 
+                        />
+                      </ListItem>
+                    </List>
+                  </Paper>
+                </Grid>
+                
+                <Grid item xs={12}>
+                  <Paper elevation={0} variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>Course Enrollment</span>
+                      {selectedUserForDetails.totalCourses > 0 && (
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          startIcon={<AssessmentIcon />}
+                          onClick={() => {
+                            handleCloseUserDetailsDialog();
+                            handleViewProgress(selectedUserForDetails);
+                          }}
+                          sx={{ borderRadius: 2, textTransform: 'none' }}
+                        >
+                          View Detailed Progress
+                        </Button>
+                      )}
+                    </Typography>
+                    
+                    {selectedUserForDetails.courses && selectedUserForDetails.courses.length > 0 ? (
+                      <TableContainer>
+                        <Table size="small">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Course Name</TableCell>
+                              <TableCell>Progress</TableCell>
+                              <TableCell align="right">Avg. Score</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {selectedUserForDetails.courses.map(course => (
+                              <TableRow key={course.id}>
+                                <TableCell>{course.id.replace(/-/g, ' ').toUpperCase()}</TableCell>
+                                <TableCell>
+                                  <LinearProgress 
+                                    variant="determinate" 
+                                    value={course.avgScore || 0}
+                                    color={getScoreColor(course.avgScore || 0)}
+                                    sx={{ height: 6, borderRadius: 3 }}
+                                  />
+                                </TableCell>
+                                <TableCell align="right">
+                                  <Chip
+                                    label={`${(course.avgScore || 0).toFixed(1)}%`}
+                                    size="small"
+                                    color={getScoreColor(course.avgScore || 0)}
+                                  />
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    ) : (
+                      <Typography variant="body1" color="text.secondary" align="center" sx={{ py: 2 }}>
+                        User has not enrolled in any courses yet.
+                      </Typography>
+                    )}
+                  </Paper>
+                </Grid>
+              </Grid>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button 
+            onClick={handleCloseUserDetailsDialog} 
+            variant="outlined"
+            sx={{ borderRadius: 2, textTransform: 'none', mr: 1 }}
+          >
+            Close
+          </Button>
+          <Button 
+            onClick={() => {
+              handleCloseUserDetailsDialog();
+              handleViewProgress(selectedUserForDetails);
+            }} 
+            variant="contained"
+            disabled={!selectedUserForDetails || selectedUserForDetails.totalCourses === 0}
+            sx={{ borderRadius: 2, textTransform: 'none' }}
+          >
+            View Detailed Progress
           </Button>
         </DialogActions>
       </Dialog>
