@@ -53,8 +53,15 @@ export default function AdminDashboard() {
           ...course.data()
         }));
         
-        const avgScore = courses.length > 0 ? 
-          courses.reduce((acc, curr) => acc + (curr.lastScore || 0), 0) / courses.length : 0;
+        // Use the globalAvgScore if available, otherwise calculate from courses
+        let avgScore = userData.globalAvgScore;
+        
+        // If globalAvgScore is not available, use the avgScore from courses instead of lastScore
+        if (avgScore === undefined) {
+          const coursesWithScores = courses.filter(course => course.avgScore !== undefined);
+          avgScore = coursesWithScores.length > 0 ? 
+            coursesWithScores.reduce((acc, curr) => acc + (curr.avgScore || 0), 0) / coursesWithScores.length : 0;
+        }
         
         const userWithStats = {
           id: docRef.id,

@@ -43,14 +43,6 @@ app.post('/api/update-progress', authenticate, async (req, res) => {
     else if(score >= 50) newDifficulty = 'intermediate';
     else newDifficulty = 'beginner';
 
-    // Update course-level progress
-    await userProgressRef.set({
-      lastChapter: chapterId,
-      lastScore: score,
-      difficulty: newDifficulty,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-
     // Get current chapter data
     const chapterDoc = await chapterProgressRef.get();
     const chapterData = chapterDoc.exists ? chapterDoc.data() : { scores: [] };
@@ -58,14 +50,76 @@ app.post('/api/update-progress', authenticate, async (req, res) => {
     // Add the new score to the scores array
     const updatedScores = [...(chapterData.scores || []), score];
     
-    // Save chapter-specific score including lastScore field
+    // Calculate average score for this chapter
+    const chapterAvgScore = updatedScores.reduce((sum, s) => sum + s, 0) / updatedScores.length;
+
+    // Save chapter-specific score including avgScore field
     await chapterProgressRef.set({
       scores: updatedScores,
-      lastScore: score, // Add lastScore field
+      avgScore: chapterAvgScore,
       lastUpdated: admin.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
-    res.status(200).json({ difficulty: newDifficulty });
+    // Get all chapters for this course to calculate course average
+    const chaptersSnapshot = await db.collection('users').doc(userId)
+      .collection('progress').doc(courseId)
+      .collection('chapters').get();
+    
+    let allCourseScores = [];
+    chaptersSnapshot.docs.forEach(doc => {
+      const data = doc.data();
+      if (data.scores && Array.isArray(data.scores)) {
+        allCourseScores = [...allCourseScores, ...data.scores];
+      }
+    });
+    
+    const courseAvgScore = allCourseScores.length > 0 ?
+      allCourseScores.reduce((sum, s) => sum + s, 0) / allCourseScores.length : 0;
+
+    // Update course-level progress with avgScore
+    await userProgressRef.set({
+      lastChapter: chapterId,
+      avgScore: courseAvgScore,
+      difficulty: newDifficulty,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    // Calculate global average score across all courses
+    const userProgressSnapshot = await db.collection('users').doc(userId)
+      .collection('progress').get();
+    
+    let totalScores = 0;
+    let totalScoreCount = 0;
+    
+    for (const courseDoc of userProgressSnapshot.docs) {
+      const chaptersSnap = await db.collection('users').doc(userId)
+        .collection('progress').doc(courseDoc.id)
+        .collection('chapters').get();
+        
+      chaptersSnap.docs.forEach(chapDoc => {
+        const chapData = chapDoc.data();
+        if (chapData.scores && Array.isArray(chapData.scores)) {
+          const scores = chapData.scores;
+          totalScores += scores.reduce((sum, s) => sum + s, 0);
+          totalScoreCount += scores.length;
+        }
+      });
+    }
+    
+    const globalAvgScore = totalScoreCount > 0 ? totalScores / totalScoreCount : 0;
+    
+    // Store global average in user document
+    await db.collection('users').doc(userId).set({
+      globalAvgScore,
+      lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    res.status(200).json({ 
+      difficulty: newDifficulty,
+      chapterAvgScore,
+      courseAvgScore,
+      globalAvgScore
+    });
   } catch (error) {
     res.status(500).send(error.message);
   }
