@@ -302,7 +302,10 @@ export default function AdminDashboard() {
           ) : userProgress && userProgress.length > 0 ? (
             <Box>
               {userProgress.map((course) => (
-                <Accordion key={course.courseId} defaultExpanded sx={{ mb: 2, borderRadius: 1 }}>
+                <Accordion 
+                  key={course.courseId} 
+                  sx={{ mb: 2, borderRadius: 1 }}
+                >
                   <AccordionSummary 
                     expandIcon={<ExpandMoreIcon />}
                     sx={{ 
