@@ -25,22 +25,44 @@ app.post('/api/update-progress', authenticate, async (req, res) => {
     const { courseId, chapterId, score } = req.body;
     const userId = req.user.uid;
 
+    // Reference to course-level progress document
     const userProgressRef = db.collection('users').doc(userId)
       .collection('progress').doc(courseId);
+    
+    // Reference to chapter-specific progress document
+    const chapterProgressRef = db.collection('users').doc(userId)
+      .collection('progress').doc(courseId)
+      .collection('chapters').doc(chapterId);
 
+    // Get current course progress
     const currentProgress = (await userProgressRef.get()).data() || {};
     
+    // Calculate new difficulty based on the latest score
     let newDifficulty = currentProgress.difficulty || 'beginner';
     if(score >= 80) newDifficulty = 'advanced';
     else if(score >= 50) newDifficulty = 'intermediate';
     else newDifficulty = 'beginner';
 
+    // Update course-level progress
     await userProgressRef.set({
       lastChapter: chapterId,
       lastScore: score,
       difficulty: newDifficulty,
-      scores: [...(currentProgress.scores || []), score],
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    // Get current chapter data
+    const chapterDoc = await chapterProgressRef.get();
+    const chapterData = chapterDoc.exists ? chapterDoc.data() : { scores: [] };
+    
+    // Add the new score to the scores array
+    const updatedScores = [...(chapterData.scores || []), score];
+    
+    // Save chapter-specific score including lastScore field
+    await chapterProgressRef.set({
+      scores: updatedScores,
+      lastScore: score, // Add lastScore field
+      lastUpdated: admin.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
     res.status(200).json({ difficulty: newDifficulty });
