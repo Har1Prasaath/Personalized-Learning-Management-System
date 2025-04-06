@@ -166,7 +166,7 @@ export default function Course() {
 
     try {
       const token = await auth.currentUser.getIdToken();
-      const response = await fetch('http://localhost:5000/api/update-progress', {
+      const response = await fetch('https://personalized-learning-management-system.onrender.com/api/update-progress', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
