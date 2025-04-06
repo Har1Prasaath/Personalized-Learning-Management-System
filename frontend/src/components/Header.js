@@ -1,6 +1,6 @@
 // frontend/src/components/Header.js
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Box, IconButton, Avatar, Menu, MenuItem, ListItemIcon } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, IconButton, Avatar, Menu, MenuItem, ListItemIcon, Tooltip } from '@mui/material';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
@@ -97,6 +97,25 @@ export default function Header() {
               {auth.currentUser?.displayName}
             </Typography>
           </Box>
+
+          {/* Add logout button */}
+          <Tooltip title="Logout">
+            <IconButton 
+              color="inherit" 
+              onClick={handleLogout} 
+              sx={{ 
+                p: 1, 
+                '&:hover': { 
+                  backgroundColor: 'rgba(255,255,255,0.1)', 
+                  transform: 'scale(1.1)' 
+                }, 
+                transition: 'all 0.2s ease' 
+              }}
+              aria-label="logout"
+            >
+              <Logout style={{ width: 24, height: 24 }} />
+            </IconButton>
+          </Tooltip>
 
           <Menu
             anchorEl={anchorEl}
