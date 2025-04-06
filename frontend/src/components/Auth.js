@@ -4,7 +4,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  updateProfile
 } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { useNavigate } from 'react-router-dom';
@@ -39,6 +40,7 @@ const fadeIn = keyframes`
 export default function Auth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState(''); // Add this line for name state
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
@@ -67,10 +69,15 @@ export default function Auth() {
       } else {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
+        
+        // Update user profile with the name
+        await updateProfile(user, {
+          displayName: name
+        });
 
         await setDoc(doc(db, 'users', user.uid), {
           email: user.email,
-          displayName: user.displayName || '',
+          displayName: name,
           photoURL: user.photoURL || '',
           role: 'user',
           createdAt: new Date(),
@@ -168,6 +175,26 @@ export default function Auth() {
         )}
 
         <form onSubmit={handleAuth} style={{ width: '100%' }}>
+          {!isLogin && (
+            <TextField 
+              fullWidth 
+              margin="normal" 
+              label="Full Name" 
+              variant="outlined" 
+              required 
+              sx={{ 
+                backgroundColor: 'rgba(255, 255, 255, 0.9)', 
+                borderRadius: 2, 
+                '& .MuiOutlinedInput-root': { 
+                  '& fieldset': { borderColor: '#E0E0E0' }, 
+                  '&:hover fieldset': { borderColor: '#4B8EC9' }, 
+                  '&.Mui-focused fieldset': { borderColor: '#4B8EC9' } 
+                } 
+              }} 
+              onChange={(e) => setName(e.target.value)} 
+            />
+          )}
+
           <TextField 
             fullWidth 
             margin="normal" 
