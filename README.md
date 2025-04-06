@@ -2,7 +2,9 @@
 
 A modern, adaptive learning platform that tailors educational content to individual student needs.
 
-![Personalized Learning Management System](./frontend/public/assets/logo.png)
+![User Dashboard](./frontend/public/assets/user.png)
+
+![Admin Dashboard](./frontend/public/assets/admin.png)
 
 ## Overview
 
