@@ -1,6 +1,6 @@
 // frontend/src/components/Header.js
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Box, IconButton, Avatar, Menu, MenuItem, ListItemIcon } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, IconButton, Avatar, Menu, MenuItem, ListItemIcon, Tooltip } from '@mui/material';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
@@ -83,20 +83,51 @@ export default function Header() {
             }}
             onClick={handleProfileClick}
           >
-            {auth.currentUser?.photoURL && (
-              <Box sx={{ 
-                border: '2px solid transparent', 
-                borderRadius: '50%', 
-                background: 'linear-gradient(225deg, #4B8EC9, rgb(212, 139, 129)) border-box', 
-                padding: '2px' 
-              }}>
+            {/* Always show avatar with fallback for users without photos */}
+            <Box sx={{ 
+              border: '2px solid transparent', 
+              borderRadius: '50%', 
+              background: 'linear-gradient(225deg, #4B8EC9, rgb(212, 139, 129)) border-box', 
+              padding: '2px' 
+            }}>
+              {auth.currentUser?.photoURL ? (
                 <Avatar src={auth.currentUser.photoURL} sx={{ width: 36, height: 36, border: '2px solid white' }} />
-              </Box>
-            )}
+              ) : (
+                <Avatar sx={{ 
+                  width: 36, 
+                  height: 36, 
+                  border: '2px solid white',
+                  bgcolor: '#4B8EC9',
+                  color: 'white',
+                  fontWeight: 'bold'
+                }}>
+                  {auth.currentUser?.email?.charAt(0).toUpperCase() || 'U'}
+                </Avatar>
+              )}
+            </Box>
             <Typography variant="subtitle1" sx={{ color: 'white', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>
-              {auth.currentUser?.displayName}
+              {auth.currentUser?.displayName || auth.currentUser?.email?.split('@')[0] || 'User'}
             </Typography>
           </Box>
+
+          {/* Add logout button */}
+          <Tooltip title="Logout">
+            <IconButton 
+              color="inherit" 
+              onClick={handleLogout} 
+              sx={{ 
+                p: 1, 
+                '&:hover': { 
+                  backgroundColor: 'rgba(255,255,255,0.1)', 
+                  transform: 'scale(1.1)' 
+                }, 
+                transition: 'all 0.2s ease' 
+              }}
+              aria-label="logout"
+            >
+              <Logout style={{ width: 24, height: 24 }} />
+            </IconButton>
+          </Tooltip>
 
           <Menu
             anchorEl={anchorEl}
