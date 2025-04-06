@@ -4,7 +4,7 @@ const cors = require('cors');
 const { admin, db } = require('./firebase');
 
 const app = express();
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(cors({ origin: 'https://personalized-learning-management-system.vercel.app/', credentials: true }));
 app.use(express.json());
 
 const authenticate = async (req, res, next) => {
