@@ -22,7 +22,12 @@ import {
   DialogContent,
   DialogActions,
   Alert,
-  CircularProgress
+  CircularProgress,
+  FormControlLabel, 
+  Radio, 
+  RadioGroup, 
+  FormControl, 
+  FormLabel 
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { keyframes } from '@emotion/react';
@@ -40,7 +45,8 @@ const fadeIn = keyframes`
 export default function Auth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState(''); // Add this line for name state
+  const [name, setName] = useState('');
+  const [role, setRole] = useState('user'); // Add this line for role state
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
@@ -49,6 +55,8 @@ export default function Auth() {
   const [error, setError] = useState(null);
   const { setIsLoading } = useLoading();
   const navigate = useNavigate();
+  const [googleRoleDialogOpen, setGoogleRoleDialogOpen] = useState(false);
+  const [googleUser, setGoogleUser] = useState(null);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -75,14 +83,22 @@ export default function Auth() {
           displayName: name
         });
 
+        // Create the user document
         await setDoc(doc(db, 'users', user.uid), {
           email: user.email,
           displayName: name,
           photoURL: user.photoURL || '',
-          role: 'user',
+          role: role,
           createdAt: new Date(),
         });
-        navigate('/home');
+        
+        // Force token refresh to apply custom claims properly
+        await auth.currentUser.getIdToken(true);
+        
+        // Add small delay to ensure Firestore permissions update
+        setTimeout(() => {
+          navigate(role === 'admin' ? '/admin/dashboard' : '/home');
+        }, 1000);
       }
     } catch (error) {
       setError(getAuthErrorMessage(error.code));
@@ -104,18 +120,42 @@ export default function Auth() {
         const role = userDoc.data().role;
         navigate(role === 'admin' ? '/admin/dashboard' : '/home');
       } else {
-        await setDoc(doc(db, 'users', user.uid), {
-          email: user.email,
-          displayName: user.displayName || '',
-          photoURL: user.photoURL || '',
-          role: 'user',
-          createdAt: new Date(),
-        });
-        navigate('/home');
+        // For new Google users, open a dialog to select role
+        setGoogleUser(user);
+        setGoogleRoleDialogOpen(true);
       }
     } catch (error) {
       setError(getAuthErrorMessage(error.code));
     } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleRoleSelect = async (selectedRole) => {
+    setIsLoading(true);
+    try {
+      if (googleUser) {
+        await setDoc(doc(db, 'users', googleUser.uid), {
+          email: googleUser.email,
+          displayName: googleUser.displayName || '',
+          photoURL: googleUser.photoURL || '',
+          role: selectedRole,
+          createdAt: new Date(),
+        });
+        
+        // Force token refresh
+        await auth.currentUser.getIdToken(true);
+        
+        // Add small delay to ensure Firestore permissions update
+        setTimeout(() => {
+          navigate(selectedRole === 'admin' ? '/admin/dashboard' : '/home');
+        }, 1000);
+      }
+    } catch (error) {
+      setError('Error setting user role. Please try again.');
+    } finally {
+      setGoogleRoleDialogOpen(false);
+      setGoogleUser(null);
       setIsLoading(false);
     }
   };
@@ -193,6 +233,24 @@ export default function Auth() {
               }} 
               onChange={(e) => setName(e.target.value)} 
             />
+          )}
+
+          {!isLogin && (
+            <FormControl component="fieldset" fullWidth margin="normal" sx={{ 
+              backgroundColor: 'rgba(255, 255, 255, 0.9)', 
+              borderRadius: 2,
+              p: 2
+            }}>
+              <FormLabel component="legend">Account Type</FormLabel>
+              <RadioGroup 
+                row 
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+              >
+                <FormControlLabel value="user" control={<Radio />} label="Learner" />
+                <FormControlLabel value="admin" control={<Radio />} label="Administrator" />
+              </RadioGroup>
+            </FormControl>
           )}
 
           <TextField 
@@ -410,6 +468,30 @@ export default function Auth() {
             </Button>
           )}
         </DialogActions>
+      </Dialog>
+
+      {/* Role Selection Dialog for Google Sign-In */}
+      <Dialog open={googleRoleDialogOpen} onClose={() => setGoogleRoleDialogOpen(false)}>
+        <DialogTitle>Select Account Type</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            Please select your account type:
+          </Typography>
+          <RadioGroup defaultValue="user">
+            <FormControlLabel 
+              value="user" 
+              control={<Radio />} 
+              label="Learner" 
+              onClick={() => handleGoogleRoleSelect('user')}
+            />
+            <FormControlLabel 
+              value="admin" 
+              control={<Radio />} 
+              label="Administrator" 
+              onClick={() => handleGoogleRoleSelect('admin')}
+            />
+          </RadioGroup>
+        </DialogContent>
       </Dialog>
     </Box>
   );
