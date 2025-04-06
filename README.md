@@ -89,13 +89,7 @@ npm install
    - Add your Firebase configuration to `frontend/src/firebase.js`
    - Generate a service account key and save it as `backend/serviceAccountKey.json`
 
-4. Initialize the database
-```bash
-cd ../backend
-node initializeCourses.js
-```
-
-5. Start the development servers
+4. Start the development servers
 ```bash
 # Start backend server
 cd backend
@@ -106,7 +100,7 @@ cd frontend
 npm start
 ```
 
-6. Open your browser to `http://localhost:3000`
+5. Open your browser to `http://localhost:3000`
 
 ## Usage
 
