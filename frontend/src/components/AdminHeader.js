@@ -95,7 +95,7 @@ export default function AdminHeader() {
           <Tooltip title="Logout">
             <IconButton 
               color="inherit" 
-              onClick={handleLogout} 
+              onClick={handleLogout}  
               sx={{ 
                 p: 1, 
                 '&:hover': { 
