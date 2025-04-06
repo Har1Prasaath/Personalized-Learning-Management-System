@@ -2,8 +2,8 @@
 
 A modern, adaptive learning platform that tailors educational content to individual student needs.
 
-![Personalized Learning Management System](./frontend/public/assets/logo.png)
-
+![User Dashboard](./frontend/public/assets/user.png)
+![Admin Dashboard](./frontend/public/assets/admin.png)
 ## Overview
 
 The Personalized Learning Management System is a full-featured e-learning platform built with React and Firebase. It provides personalized learning experiences by adapting content difficulty based on student performance and learning patterns.
