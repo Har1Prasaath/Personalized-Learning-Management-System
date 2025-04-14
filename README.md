@@ -82,20 +82,13 @@ cd ../frontend
 npm install
 ```
 
-3. Setup Firebase
-   - Create a new Firebase project at [Firebase Console](https://console.firebase.google.com/)
-   - Enable Authentication (Email/Password and Google Sign-in)
-   - Create a Firestore database
-   - Add your Firebase configuration to `frontend/src/firebase.js`
-   - Generate a service account key and save it as `backend/serviceAccountKey.json`
-
-4. Initialize the database
+3. Initialize the database
 ```bash
 cd ../backend
 node initializeCourses.js
 ```
 
-5. Start the development servers
+4. Start the development servers
 ```bash
 # Start backend server
 cd backend
@@ -106,7 +99,7 @@ cd frontend
 npm start
 ```
 
-6. Open your browser to `http://localhost:3000`
+5. Open your browser to `http://localhost:3000`
 
 ## Usage
 
