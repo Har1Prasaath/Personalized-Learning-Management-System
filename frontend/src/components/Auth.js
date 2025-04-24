@@ -60,6 +60,8 @@ export default function Auth() {
   // Add state for authentication status message
   const [authMessage, setAuthMessage] = useState('');
   const [authSuccess, setAuthSuccess] = useState(false);
+  // Add this line after your other useState declarations
+  const [demoCredentialsOpen, setDemoCredentialsOpen] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -231,8 +233,40 @@ export default function Auth() {
   };
 
   return (
-    <Box sx={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', backgroundColor: '#F8FAFC' }}>
-      <Typography variant="h3" sx={{ fontFamily: 'Merriweather, serif', fontWeight: 700, color: '#2D3748', textAlign: 'center', position: 'absolute', top: '10%', zIndex: 2, width: '100%', fontSize: { xs: '2rem', sm: '2.5rem' }, letterSpacing: '0.5px' }}>
+    <Box sx={{ 
+      position: 'relative',  // Changed from 'fixed' to 'relative'
+      minHeight: '100vh',    // Use minHeight instead of height
+      width: '100%',
+      display: 'flex', 
+      flexDirection: 'column', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      overflowY: 'auto',     // Allow vertical scrolling
+      paddingY: 4,           // Add padding on top and bottom
+      backgroundColor: '#F8FAFC' 
+    }}>
+      <Typography 
+        variant="h3" 
+        sx={{ 
+          fontFamily: 'Merriweather, serif', 
+          fontWeight: 700, 
+          color: '#2D3748', 
+          textAlign: 'center', 
+          position: 'relative',
+          marginTop: 4,      // Add margin at the top for spacing
+          marginBottom: '30px',  // Reduce bottom margin
+          zIndex: 2, 
+          width: '90%',
+          maxWidth: '600px',
+          fontSize: { 
+            xs: '1.5rem', 
+            sm: '1.8rem', 
+            md: '2.2rem' 
+          }, 
+          letterSpacing: '0.5px',
+          padding: '0 15px'
+        }}
+      >
         Personalized Learning Management System
       </Typography>
       
@@ -439,6 +473,29 @@ export default function Auth() {
             > 
               Sign in with Google 
             </Button> 
+            
+            {/* Demo Credentials Section */}
+            <Button 
+              fullWidth 
+              variant="outlined" 
+              onClick={() => setDemoCredentialsOpen(true)} 
+              sx={{ 
+                mt: 2,
+                borderColor: '#4B8EC9',
+                color: '#4B8EC9',
+                '&:hover': { 
+                  backgroundColor: 'rgba(75, 142, 201, 0.1)',
+                  borderColor: '#4B8EC9'
+                },
+                transition: 'all 0.3s ease', 
+                py: 1, 
+                borderRadius: 2,
+                fontWeight: 500,
+                textTransform: 'none' 
+              }} 
+            > 
+              View Demo Credentials
+            </Button>
           </Box>
         </form>
       </Container>
@@ -534,6 +591,69 @@ export default function Auth() {
             />
           </RadioGroup>
         </DialogContent>
+      </Dialog>
+
+      {/* Demo Credentials Dialog - Add this before final closing Box tag */}
+      <Dialog 
+        open={demoCredentialsOpen} 
+        onClose={() => setDemoCredentialsOpen(false)}
+        PaperProps={{ 
+          sx: { 
+            borderRadius: 2,
+            width: '100%', 
+            maxWidth: '400px',
+            p: 1 
+          } 
+        }}
+      >
+        <DialogTitle sx={{ 
+          textAlign: 'center', 
+          color: '#4B8EC9', 
+          fontWeight: 600,
+          pb: 1
+        }}>
+          Demo Credentials
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ mb: 3, bgcolor: 'rgba(75, 142, 201, 0.05)', p: 2, borderRadius: 2 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Student Login</Typography>
+            <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <span>Email:</span>
+              <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>student@gmail.com</span>
+            </Typography>
+            <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>Password:</span>
+              <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>Student@123</span>
+            </Typography>
+          </Box>
+          
+          <Box sx={{ bgcolor: 'rgba(75, 142, 201, 0.05)', p: 2, borderRadius: 2 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Admin Login</Typography>
+            <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <span>Email:</span>
+              <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>plmsverification@gmail.com</span>
+            </Typography>
+            <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>Password:</span>
+              <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>Verify@123</span>
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => setDemoCredentialsOpen(false)}
+            variant="contained" 
+            fullWidth
+            sx={{ 
+              background: 'linear-gradient(45deg, #4B8EC9 30%, #FF9A8D 90%)',
+              borderRadius: 2,
+              py: 1,
+              mb: 1
+            }}
+          >
+            Close
+          </Button>
+        </DialogActions>
       </Dialog>
     </Box>
   );
