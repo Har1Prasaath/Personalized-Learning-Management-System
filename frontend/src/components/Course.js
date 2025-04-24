@@ -166,7 +166,13 @@ export default function Course() {
 
     try {
       const token = await auth.currentUser.getIdToken();
-      const response = await fetch('https://personalized-learning-management-system.onrender.com/api/update-progress', {
+      
+      // Use environment-based API URL
+      const API_BASE_URL = process.env.NODE_ENV === 'production' 
+        ? 'https://personalized-learning-management-system.onrender.com'
+        : 'http://localhost:5000'; // Assuming local server runs on port 5000
+      
+      const response = await fetch(`${API_BASE_URL}/api/update-progress`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
