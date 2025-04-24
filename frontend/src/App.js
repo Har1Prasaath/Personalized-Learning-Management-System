@@ -10,7 +10,7 @@ import Profile from './components/Profile';
 import AdminDashboard from './components/AdminDashboard';
 import Header from './components/Header';
 import AdminHeader from './components/AdminHeader';
-import { Box } from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import LoadingSpinner from './components/LoadingSpinner';
 import { LoadingProvider, useLoading } from './context/LoadingContext';
 
@@ -25,7 +25,7 @@ function AppWrapper() {
 function App() {
   const [user, setUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
-  const { setIsLoading } = useLoading();
+  const { setIsLoading, isLoading } = useLoading();
   const location = useLocation();
 
   useEffect(() => {
@@ -34,8 +34,15 @@ function App() {
       setUser(currentUser);
       
       if (currentUser) {
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        setUserRole(userDoc.exists() ? userDoc.data().role : 'user');
+        // Get user role from Firestore
+        try {
+          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+          setUserRole(userDoc.exists() ? userDoc.data().role : 'user');
+        } catch (error) {
+          console.error("Error fetching user role:", error);
+          // Default to user role on error
+          setUserRole('user');
+        }
       } else {
         setUserRole(null);
       }
@@ -43,6 +50,25 @@ function App() {
     });
     return unsubscribe;
   }, [setIsLoading]);
+
+  // Show loading state while determining user role
+  if (user && userRole === null) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh', 
+        flexDirection: 'column',
+        backgroundColor: '#F8FAFC'
+      }}>
+        <CircularProgress size={60} />
+        <Typography variant="h6" sx={{ mt: 3 }}>
+          Loading your dashboard...
+        </Typography>
+      </Box>
+    );
+  }
 
   const getHeader = () => {
     if (!user) return null;

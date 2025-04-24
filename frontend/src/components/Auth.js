@@ -46,7 +46,7 @@ export default function Auth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [role, setRole] = useState('user'); // Add this line for role state
+  const [role, setRole] = useState('user');
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
@@ -57,6 +57,9 @@ export default function Auth() {
   const navigate = useNavigate();
   const [googleRoleDialogOpen, setGoogleRoleDialogOpen] = useState(false);
   const [googleUser, setGoogleUser] = useState(null);
+  // Add state for authentication status message
+  const [authMessage, setAuthMessage] = useState('');
+  const [authSuccess, setAuthSuccess] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -68,13 +71,29 @@ export default function Auth() {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    setAuthMessage('Authenticating your credentials...');
+    
     try {
       if (isLogin) {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        
+        // Show authentication success message
+        setAuthSuccess(true);
+        setAuthMessage('Authentication successful! Verifying access...');
+        
         const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
-        const role = userDoc.data().role;
-        navigate(role === 'admin' ? '/admin/dashboard' : '/home');
+        const userRole = userDoc.data().role;
+        
+        // Show role-specific message
+        setAuthMessage(`Welcome! Redirecting to ${userRole === 'admin' ? 'admin dashboard' : 'your learning dashboard'}...`);
+        
+        // Delay navigation to allow message display
+        setTimeout(() => {
+          navigate(userRole === 'admin' ? '/admin/dashboard' : '/home');
+          setIsLoading(false);
+        }, 1000);
       } else {
+        // For registration
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         
@@ -92,17 +111,22 @@ export default function Auth() {
           createdAt: new Date(),
         });
         
+        // Show success message
+        setAuthSuccess(true);
+        setAuthMessage('Account created successfully! Setting up your dashboard...');
+        
         // Force token refresh to apply custom claims properly
         await auth.currentUser.getIdToken(true);
         
         // Add small delay to ensure Firestore permissions update
         setTimeout(() => {
           navigate(role === 'admin' ? '/admin/dashboard' : '/home');
+          setIsLoading(false);
         }, 1000);
       }
     } catch (error) {
       setError(getAuthErrorMessage(error.code));
-    } finally {
+      setAuthMessage('');
       setIsLoading(false);
     }
   };
@@ -110,6 +134,8 @@ export default function Auth() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     setError(null);
+    setAuthMessage('Authenticating with Google...');
+    
     try {
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
@@ -117,16 +143,25 @@ export default function Auth() {
 
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (userDoc.exists()) {
-        const role = userDoc.data().role;
-        navigate(role === 'admin' ? '/admin/dashboard' : '/home');
+        const userRole = userDoc.data().role;
+        
+        setAuthSuccess(true);
+        setAuthMessage(`Google authentication successful! Redirecting to ${userRole === 'admin' ? 'admin dashboard' : 'your learning dashboard'}...`);
+        
+        setTimeout(() => {
+          navigate(userRole === 'admin' ? '/admin/dashboard' : '/home');
+          setIsLoading(false);
+        }, 1000);
       } else {
         // For new Google users, open a dialog to select role
+        setAuthMessage('');
         setGoogleUser(user);
         setGoogleRoleDialogOpen(true);
+        setIsLoading(false);
       }
     } catch (error) {
       setError(getAuthErrorMessage(error.code));
-    } finally {
+      setAuthMessage('');
       setIsLoading(false);
     }
   };
@@ -200,13 +235,20 @@ export default function Auth() {
       <Typography variant="h3" sx={{ fontFamily: 'Merriweather, serif', fontWeight: 700, color: '#2D3748', textAlign: 'center', position: 'absolute', top: '10%', zIndex: 2, width: '100%', fontSize: { xs: '2rem', sm: '2.5rem' }, letterSpacing: '0.5px' }}>
         Personalized Learning Management System
       </Typography>
-
-      <Particles id="tsparticles" init={particlesInit} options={{ background: { color: { value: '#F8FAFC' } }, fpsLimit: 60, interactivity: { events: { onHover: { enable: true, mode: 'repulse' }, resize: true }, modes: { repulse: { distance: 100, duration: 0.4 } } }, particles: { color: { value: ['#4B8EC9', '#FF9A8D', '#6C5CE7'] }, links: { color: '#4B8EC9', distance: 150, enable: true, opacity: 0.4, width: 1 }, collisions: { enable: true }, move: { direction: 'none', enable: true, outModes: { default: 'bounce' }, speed: 1.5 }, number: { density: { enable: true, area: 800 }, value: 40 }, opacity: { value: 0.5 }, shape: { type: 'circle' }, size: { value: { min: 1, max: 3 } } }, detectRetina: true }} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }} />
+      
+      <Particles id="tsparticles" init={particlesInit} options={{ background: { color: { value: '#F8FAFC' } }, fpsLimit: 60, interactivity: { events: { onHover: { enable: true, mode: 'repulse' }, resize: true }, modes: { repulse: { distance: 100, duration: 0.4 } } }, particles: { color: { value: ['#4B8EC9', '#FF9A8D', '#6C5CE7'] }, links: { color: '#4B8EC9', distance: 150, enable: true, opacity: 0.4, width: 1 }, collisions: { enable: true }, move: { direction: 'none', enable: true, outModes: { default: 'bounce' }, speed: 1.5 }, number: { density: { enable: true, area: 800 }, value: 40 }, opacity: { value: 0.5 }, shape: { type: 'circle' }, size: { value: { min: 1, max: 5 } }, } }} />
 
       <Container maxWidth="xs" sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255, 255, 255, 0.95)', borderRadius: 4, p: 4, boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)', backdropFilter: 'blur(12px)', animation: `${fadeIn} 0.6s ease-out`, width: '100%', maxWidth: '400px', mx: 'auto', marginTop: '30px' }}>
-        <Typography variant="h2" gutterBottom sx={{ color: 'text.primary', mb: 3, fontWeight: 700, background: 'linear-gradient(45deg, #4B8EC9 30%, #FF9A8D 90%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+        <Typography variant="h2" gutterBottom sx={{ color: 'text.primary', mb: 3, fontWeight: 700, background: 'linear-gradient(45deg, #4B8EC9 30%, #FF9A8D 90%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontSize: '2rem' }}>
           {isLogin ? 'Welcome Back' : 'Create Account'}
         </Typography>
+
+        {/* Authentication status message */}
+        {authMessage && (
+          <Alert severity={authSuccess ? "success" : "info"} sx={{ width: '100%', mb: 2 }}>
+            {authMessage}
+          </Alert>
+        )}
 
         {error && (
           <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
